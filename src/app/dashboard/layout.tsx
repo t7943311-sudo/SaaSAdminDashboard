@@ -17,7 +17,7 @@ export default function DashboardLayout({
         <div className="flex flex-col h-full">
             <div className="p-4 flex items-center gap-2">
                 <Logo className="w-8 h-8 text-primary" />
-                <h1 className="text-xl font-bold group-data-[collapsible=icon]:hidden">LaunchBase</h1>
+                <h1 className="text-xl font-bold group-data-[collapsible=icon]:hidden">Stellar</h1>
             </div>
             <DashboardNav />
         </div>

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "LaunchBase",
+  title: "Stellar - The Ultimate SaaS Starter Kit",
   description: "The Ultimate SaaS Starter Kit for Founders & Developers",
 };
 

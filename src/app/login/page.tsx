@@ -20,7 +20,7 @@ export default function LoginPage() {
             <div className="flex justify-center items-center mb-4">
               <Logo className="w-10 h-10 text-primary" />
             </div>
-          <CardTitle className="text-2xl">Log In to LaunchBase</CardTitle>
+          <CardTitle className="text-2xl">Log In to Stellar</CardTitle>
           <CardDescription>
             Welcome back! Please enter your details.
           </CardDescription>

@@ -23,7 +23,7 @@ export default function SignupPage() {
             </div>
           <CardTitle className="text-2xl">Create an Account</CardTitle>
           <CardDescription>
-            Join LaunchBase and start building your SaaS today.
+            Join Stellar and start building your SaaS today.
           </CardDescription>
         </CardHeader>
         <CardContent>

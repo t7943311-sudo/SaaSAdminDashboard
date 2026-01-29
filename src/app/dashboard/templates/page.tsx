@@ -56,7 +56,7 @@ export default function TemplatesPage() {
             <CardTitle>AI Template Generator</CardTitle>
             <CardDescription>
               Describe the template you want to create. Be as specific as
-              possible. This is a feature of LaunchBase.
+              possible. This is a feature of Stellar.
             </CardDescription>
           </CardHeader>
           <CardContent>

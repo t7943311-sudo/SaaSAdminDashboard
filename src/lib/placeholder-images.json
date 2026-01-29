@@ -2,7 +2,7 @@
   "placeholderImages": [
     {
       "id": "hero",
-      "description": "A screenshot of the LaunchBase dashboard.",
+      "description": "A screenshot of the Stellar dashboard.",
       "imageUrl": "https://images.unsplash.com/photo-1728518278514-649c8fe6b949?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkYXNoYm9hcmQlMjBzY3JlZW5zaG90fGVufDB8fHx8MTc2OTcwMTAyNXww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "dashboard screenshot"
     },
