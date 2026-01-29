@@ -13,9 +13,7 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search, MoreVertical, PlusCircle, File } from "lucide-react";
@@ -27,46 +25,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { collection } from "firebase/firestore";
+import type { User as FirebaseUserEntity } from "@/lib/types";
 
-const users = [
-  {
-    name: "Olivia Martin",
-    email: "olivia.martin@email.com",
-    role: "Admin",
-    status: "Active",
-    avatar: "https://picsum.photos/seed/u1/40/40",
-  },
-  {
-    name: "Jackson Lee",
-    email: "jackson.lee@email.com",
-    role: "Member",
-    status: "Active",
-    avatar: "https://picsum.photos/seed/u2/40/40",
-  },
-  {
-    name: "Isabella Nguyen",
-    email: "isabella.nguyen@email.com",
-    role: "Member",
-    status: "Inactive",
-    avatar: "https://picsum.photos/seed/u3/40/40",
-  },
-  {
-    name: "William Kim",
-    email: "will@email.com",
-    role: "Member",
-    status: "Active",
-    avatar: "https://picsum.photos/seed/u4/40/40",
-  },
-  {
-    name: "Sofia Davis",
-    email: "sofia.davis@email.com",
-    role: "Admin",
-    status: "Active",
-    avatar: "https://picsum.photos/seed/u5/40/40",
-  },
-];
 
 export default function UsersPage() {
+    const firestore = useFirestore();
+    const usersCollection = useMemoFirebase(() => collection(firestore, 'users'), [firestore]);
+    const { data: users, isLoading } = useCollection<FirebaseUserEntity>(usersCollection);
+
+    const getInitials = (firstName?: string, lastName?: string) => {
+        return `${firstName?.charAt(0) ?? ''}${lastName?.charAt(0) ?? ''}`.toUpperCase();
+    }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start">
@@ -110,16 +82,20 @@ export default function UsersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.email}>
+              {isLoading && (
+                  <TableRow>
+                      <TableCell colSpan={4} className="text-center">Loading users...</TableCell>
+                  </TableRow>
+              )}
+              {users && users.map((user) => (
+                <TableRow key={user.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar>
-                        <AvatarImage src={user.avatar} />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>{getInitials(user.firstName, user.lastName)}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-medium">{user.name}</div>
+                        <div className="font-medium">{user.firstName} {user.lastName}</div>
                         <div className="text-sm text-muted-foreground">
                           {user.email}
                         </div>
@@ -127,12 +103,12 @@ export default function UsersPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.role === 'Admin' ? 'default' : 'secondary'}>{user.role}</Badge>
+                    <Badge variant={'secondary'}>Member</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.status === 'Active' ? 'secondary' : 'outline'}>
-                      <div className={`w-2 h-2 rounded-full mr-2 ${user.status === 'Active' ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-                      {user.status}
+                    <Badge variant={'secondary'}>
+                      <div className={`w-2 h-2 rounded-full mr-2 bg-green-500`}></div>
+                      Active
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">

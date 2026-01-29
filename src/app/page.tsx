@@ -1,8 +1,8 @@
-
+'use client';
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import {
   Lock,
   LayoutDashboard,
@@ -15,6 +15,7 @@ import { Logo } from "@/components/logo";
 import { placeholderImages } from "@/lib/placeholder-images";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useUser } from "@/firebase";
 
 const features = [
   {
@@ -71,6 +72,7 @@ const testimonials = [
 ]
 
 export default function LandingPage() {
+  const { user, isUserLoading } = useUser();
   const heroImage = placeholderImages.find(p => p.id === "hero");
   const howItWorksImage = placeholderImages.find(p => p.id === "how-it-works");
 
@@ -84,12 +86,25 @@ export default function LandingPage() {
           <h1 className="text-2xl font-bold">LaunchBase</h1>
         </div>
         <nav className="flex items-center gap-4">
-          <Button variant="ghost" asChild>
-            <Link href="/login">Log In</Link>
-          </Button>
-          <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground" asChild>
-            <Link href="/register">Get Started</Link>
-          </Button>
+          {isUserLoading ? (
+            <div className="h-10 w-48 flex gap-2">
+              <div className="h-full w-1/2 animate-pulse rounded-md bg-muted"></div>
+              <div className="h-full w-1/2 animate-pulse rounded-md bg-muted"></div>
+            </div>
+          ) : user ? (
+            <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground" asChild>
+              <Link href="/dashboard">Go to Dashboard</Link>
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/login">Log In</Link>
+              </Button>
+              <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground" asChild>
+                <Link href="/register">Get Started</Link>
+              </Button>
+            </>
+          )}
         </nav>
       </header>
 

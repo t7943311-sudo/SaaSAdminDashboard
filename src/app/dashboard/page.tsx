@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -24,7 +23,6 @@ import {
   DollarSign,
   Activity,
   TrendingUp,
-  MoreVertical,
 } from "lucide-react";
 import {
   Table,
@@ -36,6 +34,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUser } from "@/firebase";
 
 const monthlyAnalyticsData = [
   { name: "Jan", total: Math.floor(Math.random() * 5000) + 1000 },
@@ -71,6 +70,7 @@ const recentActivities = [
 
 export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
+  const { user } = useUser();
 
   useEffect(() => {
     setIsClient(true);
@@ -82,7 +82,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl md:text-3xl font-bold">Welcome back, Adam!</h1>
+      <h1 className="text-2xl md:text-3xl font-bold">Welcome back, {user?.displayName?.split(' ')[0] || 'User'}!</h1>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>

@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { DashboardNav } from "@/components/dashboard-nav";
 import { UserNav } from "@/components/user-nav";
@@ -5,12 +9,30 @@ import { Logo } from "@/components/logo";
 import { Bell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useUser } from '@/firebase';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
+
+  if (isUserLoading || !user) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
