@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/sidebar";
 import {
   CreditCard,
-  FileText,
   LayoutGrid,
   Settings,
   Users
@@ -18,7 +17,6 @@ import {
 const navItems = [
   { href: "/dashboard", icon: <LayoutGrid />, label: "Dashboard" },
   { href: "/dashboard/users", icon: <Users />, label: "Users" },
-  { href: "/dashboard/templates", icon: <FileText />, label: "Templates" },
   { href: "/dashboard/billing", icon: <CreditCard />, label: "Billing" },
   { href: "/dashboard/settings", icon: <Settings />, label: "Settings" },
 ];
