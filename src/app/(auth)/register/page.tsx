@@ -65,6 +65,7 @@ export default function RegisterPage() {
         email: firebaseUser.email,
         firstName: firstName || "",
         lastName: lastName || "",
+        role: "member",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -91,6 +92,7 @@ export default function RegisterPage() {
         email: firebaseUser.email,
         firstName: firstName || "",
         lastName: lastName || "",
+        role: "member",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       }, { merge: true });
@@ -196,3 +198,5 @@ export default function RegisterPage() {
     </Card>
   );
 }
+
+    

@@ -3,6 +3,9 @@ export type User = {
     email: string;
     firstName?: string;
     lastName?: string;
+    role?: 'admin' | 'member';
     createdAt: any; 
     updatedAt: any;
 };
+
+    

@@ -33,7 +33,7 @@ import type { User as FirebaseUserEntity } from "@/lib/types";
 export default function UsersPage() {
     const firestore = useFirestore();
     const usersCollection = useMemoFirebase(() => collection(firestore, 'users'), [firestore]);
-    const { data: users, isLoading } = useCollection<FirebaseUserEntity>(usersCollection);
+    const { data: users, isLoading, error } = useCollection<FirebaseUserEntity>(usersCollection);
 
     const getInitials = (firstName?: string, lastName?: string) => {
         return `${firstName?.charAt(0) ?? ''}${lastName?.charAt(0) ?? ''}`.toUpperCase();
@@ -87,7 +87,14 @@ export default function UsersPage() {
                       <TableCell colSpan={4} className="text-center">Loading users...</TableCell>
                   </TableRow>
               )}
-              {users && users.map((user) => (
+              {error && (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-destructive">
+                    You do not have permission to view users. Please contact an administrator.
+                  </TableCell>
+                </TableRow>
+              )}
+              {!isLoading && !error && users && users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -103,7 +110,9 @@ export default function UsersPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={'secondary'}>Member</Badge>
+                    <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+                        {user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Member'}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge variant={'secondary'}>
@@ -138,3 +147,5 @@ export default function UsersPage() {
     </div>
   );
 }
+
+    
