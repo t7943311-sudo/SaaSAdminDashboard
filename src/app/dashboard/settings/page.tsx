@@ -5,6 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,11 +26,12 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Switch } from "@/components/ui/switch";
 
 const teamMembers = [
     { name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin', avatar: 'https://picsum.photos/seed/1/40/40'},
-    { name: 'Bob Williams', email: 'bob@example.com', role: 'Editor', avatar: 'https://picsum.photos/seed/2/40/40'},
-    { name: 'Charlie Brown', email: 'charlie@example.com', role: 'Viewer', avatar: 'https://picsum.photos/seed/3/40/40'},
+    { name: 'Bob Williams', email: 'bob@example.com', role: 'Member', avatar: 'https://picsum.photos/seed/2/40/40'},
+    { name: 'Charlie Brown', email: 'charlie@example.com', role: 'Member', avatar: 'https://picsum.photos/seed/3/40/40'},
 ];
 
 export default function SettingsPage() {
@@ -37,12 +39,13 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and preferences.</p>
+        <p className="text-muted-foreground">Manage your account, team, and application settings.</p>
       </div>
       <Tabs defaultValue="profile">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="team">Team</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsTrigger value="organization">Organization</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
         </TabsList>
 
@@ -54,10 +57,23 @@ export default function SettingsPage() {
                 This is how others will see you on the site.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20">
+                    <AvatarImage src="https://picsum.photos/seed/avatar/80/80" />
+                    <AvatarFallback>AD</AvatarFallback>
+                </Avatar>
+                <div className="space-y-2">
+                    <Label htmlFor="avatar-upload" className="cursor-pointer">
+                        <Button asChild><span >Upload Avatar</span></Button>
+                    </Label>
+                    <Input id="avatar-upload" type="file" className="hidden" />
+                    <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
+                </div>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" defaultValue="SaaS Pilot" />
+                <Input id="name" defaultValue="Adam Smith" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -70,7 +86,40 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="team" className="mt-6">
+        <TabsContent value="security" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Security</CardTitle>
+              <CardDescription>
+                Manage your password and two-factor authentication.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="current-password">Current Password</Label>
+                <Input id="current-password" type="password" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input id="new-password" type="password" />
+              </div>
+               <div className="flex items-center justify-between rounded-lg border p-4">
+                <div>
+                  <h3 className="font-medium">Two-Factor Authentication (2FA)</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Add an extra layer of security to your account.
+                  </p>
+                </div>
+                <Switch id="2fa-toggle" />
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button>Update Password</Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="organization" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Team Members</CardTitle>
@@ -109,8 +158,7 @@ export default function SettingsPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Admin">Admin</SelectItem>
-                            <SelectItem value="Editor">Editor</SelectItem>
-                            <SelectItem value="Viewer">Viewer</SelectItem>
+                            <SelectItem value="Member">Member</SelectItem>
                           </SelectContent>
                         </Select>
                       </TableCell>
@@ -141,7 +189,7 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label>Theme</Label>
                 <p className="text-sm text-muted-foreground">
-                    Dark mode support is coming soon!
+                    Light mode support is coming soon!
                 </p>
               </div>
             </CardContent>

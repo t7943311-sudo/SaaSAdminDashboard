@@ -12,10 +12,12 @@ import {
   FileText,
   LayoutGrid,
   Settings,
+  Users
 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", icon: <LayoutGrid />, label: "Dashboard" },
+  { href: "/dashboard/users", icon: <Users />, label: "Users" },
   { href: "/dashboard/templates", icon: <FileText />, label: "Templates" },
   { href: "/dashboard/billing", icon: <CreditCard />, label: "Billing" },
   { href: "/dashboard/settings", icon: <Settings />, label: "Settings" },
@@ -30,7 +32,7 @@ export function DashboardNav() {
         <SidebarMenuItem key={item.href}>
           <SidebarMenuButton
             asChild
-            isActive={pathname === item.href}
+            isActive={pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard')}
             tooltip={{ children: item.label, side: "right", align: "center" }}
           >
             <Link href={item.href}>

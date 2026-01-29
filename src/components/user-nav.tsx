@@ -27,14 +27,14 @@ export function UserNav() {
             {avatarImage && (
                 <AvatarImage src={avatarImage.imageUrl} alt="User Avatar" />
             )}
-            <AvatarFallback>SP</AvatarFallback>
+            <AvatarFallback>AS</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">SaaS Pilot</p>
+            <p className="text-sm font-medium leading-none">Adam Smith</p>
             <p className="text-xs leading-none text-muted-foreground">
               m@example.com
             </p>
