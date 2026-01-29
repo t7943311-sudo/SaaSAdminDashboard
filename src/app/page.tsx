@@ -1,7 +1,8 @@
+
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import {
   Lock,
   LayoutDashboard,
@@ -307,3 +308,5 @@ export function CreateProjectCard() {
     </div>
   );
 }
+
+    
