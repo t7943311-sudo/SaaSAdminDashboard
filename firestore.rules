@@ -1,0 +1,168 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict user-ownership model. All data created by a user
+ * is stored within a dedicated user-specific document tree, and only that authenticated user can
+ * access their own data. Publicly readable data is explicitly separated into its own top-level
+ * collections.
+ *
+ * Data Structure: All private user data is hierarchically organized under `/users/{userId}`, with
+ * subcollections for specific resources like `subscriptions`, `dashboardLayouts`, and `templates`.
+ * This structure enables simple and secure path-based authorization rules. Global, non-user-specific
+ * data such as `subscriptionPlans` and `roles` are stored in separate top-level collections.
+ *
+ * Key Security Decisions:
+ * - User Isolation: A user can only ever access documents within their own `/users/{userId}` path.
+ * - No User Listing: To protect user privacy, it is not possible to list all documents in the `/users` collection.
+ * - Admin-Managed Collections: Collections like `roles`, `userRoles`, and `subscriptionPlans` are intended to be
+ *   managed by backend administrators. Writes to these collections are disabled for all client-side users,
+ *   requiring a privileged backend environment (e.g., using Admin SDK) or a defined admin role to modify.
+ * - Safe Deletion: Users are not permitted to delete their own user profile document directly from the client.
+ *   Account deletion should be handled by a secure backend process.
+ *
+ * Denormalization for Authorization: The security model relies on denormalizing the `userId` onto
+ * documents within user subcollections (e.g., a `template` document contains a `userId` field).
+ * This avoids slow and costly `get()` calls to parent documents and allows rules to validate
+ * that a document's internal `userId` reference matches the user ID in the path, ensuring data integrity.
+ *
+ * Structural Segregation: User-private data (e.g., `templates`) is stored in a user's subcollection,
+ * while globally accessible data (`subscriptionPlans`) is in a separate top-level collection. This
+ * segregation ensures that query rules are simple, secure, and performant. For example, a user can
+ * safely list their own templates without any risk of accessing another user's data.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for reusable logic
+    /**
+     * isSignedIn
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * isOwner
+     * Checks if the authenticated user's UID matches the provided userId.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * isExistingOwner
+     * Checks if a document exists and if the user is the owner.
+     * Used for safe updates and deletes.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description   Stores user profile information.
+     * @path          /users/{userId}
+     * @allow         (create) An authenticated user creating their own profile document.
+     * @allow         (get, update) An authenticated user reading or updating their own profile.
+     * @deny          (list) A user trying to list all user profiles in the system.
+     * @deny          (delete) A user trying to delete their own profile.
+     * @principle     Restricts access to a user's own data tree and enforces relational integrity.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if false;
+
+      /**
+       * @description   Stores a user's subscription history.
+       * @path          /users/{userId}/subscriptions/{subscriptionId}
+       * @allow         (create, get, list, update, delete) A user managing their own subscriptions.
+       * @deny          (get) A user trying to read another user's subscription details.
+       * @principle     Enforces strict path-based ownership for a user's private subcollections.
+       */
+      match /subscriptions/{subscriptionId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description   Stores a user's custom dashboard layouts.
+       * @path          /users/{userId}/dashboardLayouts/{dashboardLayoutId}
+       * @allow         (create, get, list, update, delete) A user managing their own dashboard layouts.
+       * @deny          (get) A user trying to read another user's layout.
+       * @principle     Enforces strict path-based ownership for a user's private subcollections.
+       */
+      match /dashboardLayouts/{dashboardLayoutId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description   Stores templates generated by a user.
+       * @path          /users/{userId}/templates/{templateId}
+       * @allow         (create, get, list, update, delete) A user managing their own generated templates.
+       * @deny          (get) A user trying to read another user's template.
+       * @principle     Enforces strict path-based ownership for a user's private subcollections.
+       */
+      match /templates/{templateId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    /**
+     * @description   Publicly readable list of available subscription plans.
+     * @path          /subscriptionPlans/{subscriptionPlanId}
+     * @allow         (get, list) Any user (authenticated or not) reading the available plans.
+     * @deny          (create, update, delete) Any client trying to modify the plans.
+     * @principle     Segregates public read-only data from private user data. Writes are disabled for clients.
+     */
+    match /subscriptionPlans/{subscriptionPlanId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false; // TODO: Implement an admin-only check.
+      allow update: if false; // TODO: Implement an admin-only check.
+      allow delete: if false; // TODO: Implement an admin-only check.
+    }
+
+    /**
+     * @description   Associates users with roles. This collection should only be managed by administrators.
+     * @path          /userRoles/{userRoleId}
+     * @allow         (none) No client-side access is permitted by default.
+     * @deny          (get, list, create, update, delete) All operations from any client.
+     * @principle     Secures administrative data by denying all client access, requiring a privileged backend for modifications.
+     */
+    match /userRoles/{userRoleId} {
+      allow get: if false; // TODO: Implement an admin-only check.
+      allow list: if false; // TODO: Implement an admin-only check.
+      allow create: if false; // TODO: Implement an admin-only check.
+      allow update: if false; // TODO: Implement an admin-only check.
+      allow delete: if false; // TODO: Implement an admin-only check.
+    }
+
+    /**
+     * @description   Publicly readable list of system roles (e.g., Admin, Editor).
+     * @path          /roles/{roleId}
+     * @allow         (get, list) Any authenticated user reading the available system roles.
+     * @deny          (create, update, delete) Any client trying to modify role definitions.
+     * @principle     Allows clients to read system configuration while preventing unauthorized modification.
+     */
+    match /roles/{roleId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if false; // TODO: Implement an admin-only check.
+      allow update: if false; // TODO: Implement an admin-only check.
+      allow delete: if false; // TODO: Implement an admin-only check.
+    }
+  }
+}
