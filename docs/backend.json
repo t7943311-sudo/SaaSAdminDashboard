@@ -26,7 +26,10 @@
         "role": {
           "type": "string",
           "description": "The role of the user, e.g., 'admin' or 'member'.",
-          "enum": ["admin", "member"]
+          "enum": [
+            "admin",
+            "member"
+          ]
         },
         "createdAt": {
           "type": "string",
@@ -37,6 +40,24 @@
           "type": "string",
           "description": "Timestamp indicating when the user was last updated.",
           "format": "date-time"
+        },
+        "onboardingCompleted": {
+          "type": "boolean",
+          "description": "Flag to indicate if the user has completed the onboarding flow."
+        },
+        "workspaceName": {
+          "type": "string",
+          "description": "The name of the user's workspace, collected during onboarding."
+        },
+        "intent": {
+          "type": "string",
+          "description": "The user's primary goal or role, collected during onboarding for personalization.",
+          "enum": [
+            "Founder",
+            "Developer",
+            "Product Manager",
+            "Team Member"
+          ]
         }
       },
       "required": [

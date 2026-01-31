@@ -6,4 +6,7 @@ export type User = {
     role?: 'admin' | 'member';
     createdAt: any; 
     updatedAt: any;
+    onboardingCompleted?: boolean;
+    workspaceName?: string;
+    intent?: 'Founder' | 'Developer' | 'Product Manager' | 'Team Member';
 };

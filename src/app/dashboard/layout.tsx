@@ -9,7 +9,10 @@ import { Logo } from "@/components/logo";
 import { Bell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useUser } from '@/firebase';
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import type { User as UserType } from '@/lib/types';
+
 
 export default function DashboardLayout({
   children,
@@ -18,14 +21,27 @@ export default function DashboardLayout({
 }) {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const firestore = useFirestore();
+
+  const userDocRef = useMemoFirebase(() => {
+    if (!user) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user]);
+
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserType>(userDocRef);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/login');
     }
-  }, [user, isUserLoading, router]);
 
-  if (isUserLoading || !user) {
+    if (user && userProfile && !userProfile.onboardingCompleted) {
+        router.push('/onboarding');
+    }
+
+  }, [user, isUserLoading, userProfile, router]);
+
+  if (isUserLoading || !user || isProfileLoading || (userProfile && !userProfile.onboardingCompleted)) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>

@@ -59,18 +59,18 @@ export default function RegisterPage() {
 
       const [firstName, lastName] = fullName.split(' ').slice(0, 2);
 
-      // Create user document in Firestore
       await setDoc(doc(firestore, "users", firebaseUser.uid), {
         id: firebaseUser.uid,
         email: firebaseUser.email,
         firstName: firstName || "",
         lastName: lastName || "",
         role: "member",
+        onboardingCompleted: false,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
 
-      router.push("/dashboard");
+      router.push("/onboarding");
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -93,11 +93,12 @@ export default function RegisterPage() {
         firstName: firstName || "",
         lastName: lastName || "",
         role: "member",
+        onboardingCompleted: false,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       }, { merge: true });
 
-      router.push("/dashboard");
+      router.push("/onboarding");
     } catch (error: any) {
        toast({
         variant: "destructive",
