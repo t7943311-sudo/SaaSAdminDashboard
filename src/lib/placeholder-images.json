@@ -1,40 +1,34 @@
 {
   "placeholderImages": [
     {
-      "id": "hero",
-      "description": "A screenshot of the Stellar dashboard.",
-      "imageUrl": "https://images.unsplash.com/photo-1728518278514-649c8fe6b949?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkYXNoYm9hcmQlMjBzY3JlZW5zaG90fGVufDB8fHx8MTc2OTcwMTAyNXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "dashboard screenshot"
+      "id": "hero-dashboard-preview",
+      "description": "A preview of the LaunchBase dashboard UI.",
+      "imageUrl": "https://images.unsplash.com/photo-1765217833207-2059107afc85?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzYWFzJTIwZGFzaGJvYXJkfGVufDB8fHx8MTc2OTgwNDUwNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "saas dashboard"
     },
     {
-      "id": "avatar",
-      "description": "A placeholder avatar for a user.",
-      "imageUrl": "https://images.unsplash.com/flagged/photo-1595514191830-3e96a518989b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGVyc29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzY5NjM0MTI3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "person portrait"
+      "id": "product-preview-dashboard",
+      "description": "A detailed screenshot of the analytics dashboard.",
+      "imageUrl": "https://images.unsplash.com/photo-1608222351212-18fe0ec7b13b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxhbmFseXRpY3MlMjBkYXNoYm9hcmR8ZW58MHx8fHwxNzY5ODI1NDQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "analytics dashboard"
     },
     {
       "id": "testimonial-1",
-      "description": "A placeholder avatar for a testimonial.",
-      "imageUrl": "https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njk2MzQxMjd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "description": "Avatar for Alex Rivera.",
+      "imageUrl": "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njk3Nzc4NjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person portrait"
     },
     {
       "id": "testimonial-2",
-      "description": "A placeholder avatar for a testimonial.",
-      "imageUrl": "https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njk2MzQxMjd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "description": "Avatar for Samantha Chen.",
+      "imageUrl": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njk3Nzc4NjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person portrait"
     },
     {
       "id": "testimonial-3",
-      "description": "A placeholder avatar for a testimonial.",
-      "imageUrl": "https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njk2MzQxMjd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "description": "Avatar for David Lee.",
+      "imageUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njk3Nzc4NjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person portrait"
-    },
-    {
-      "id": "how-it-works",
-      "description": "An image illustrating a workflow.",
-      "imageUrl": "https://images.unsplash.com/photo-1675627452903-082d0a77bc6f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3b3JrZmxvdyUyMGRpYWdyYW18ZW58MHx8fHwxNzY5NzAxMDI2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "workflow diagram"
     }
   ]
 }
