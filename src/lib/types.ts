@@ -7,5 +7,3 @@ export type User = {
     createdAt: any; 
     updatedAt: any;
 };
-
-    
