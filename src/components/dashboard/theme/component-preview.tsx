@@ -17,17 +17,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useToast } from "@/hooks/use-toast";
 
 export function ComponentPreview() {
+  const { toast } = useToast();
+
   return (
     <div className="space-y-6 rounded-lg border bg-background p-4 md:p-6">
       <div className="flex flex-wrap items-start gap-4">
-        <Button>Primary</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="destructive">Destructive</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="link">Link</Button>
+        <Button onClick={() => toast({ title: 'Primary Button Clicked' })}>Primary</Button>
+        <Button variant="secondary" onClick={() => toast({ title: 'Secondary Button Clicked' })}>Secondary</Button>
+        <Button variant="destructive" onClick={() => toast({ variant: 'destructive', title: 'Destructive Button Clicked' })}>Destructive</Button>
+        <Button variant="outline" onClick={() => toast({ title: 'Outline Button Clicked' })}>Outline</Button>
+        <Button variant="ghost" onClick={() => toast({ title: 'Ghost Button Clicked' })}>Ghost</Button>
+        <Button variant="link" onClick={() => toast({ title: 'Link Button Clicked' })}>Link</Button>
       </div>
 
        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -40,19 +43,19 @@ export function ComponentPreview() {
             <p>This is the content of the card, showing how text and spacing appear inside a card component.</p>
           </CardContent>
           <CardFooter>
-            <Button className="w-full">Card Action</Button>
+            <Button className="w-full" onClick={() => toast({ title: 'Card Action Clicked', description: 'This toast demonstrates an action from a card.'})}>Card Action</Button>
           </CardFooter>
         </Card>
 
         <div className="space-y-4">
             <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input type="email" id="email" placeholder="Email" />
+                <Label htmlFor="email-preview">Email</Label>
+                <Input type="email" id="email-preview" placeholder="Email" />
             </div>
              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="plan">Choose a Plan</Label>
+                <Label htmlFor="plan-preview">Choose a Plan</Label>
                 <Select>
-                    <SelectTrigger>
+                    <SelectTrigger id="plan-preview">
                         <SelectValue placeholder="Select a plan" />
                     </SelectTrigger>
                     <SelectContent>
@@ -63,8 +66,8 @@ export function ComponentPreview() {
                 </Select>
             </div>
              <div className="flex items-center space-x-2">
-                <Switch id="airplane-mode" />
-                <Label htmlFor="airplane-mode">Airplane Mode</Label>
+                <Switch id="airplane-mode-preview" />
+                <Label htmlFor="airplane-mode-preview">Airplane Mode</Label>
             </div>
         </div>
       </div>
