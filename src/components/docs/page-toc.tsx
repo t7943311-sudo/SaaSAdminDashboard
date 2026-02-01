@@ -22,7 +22,7 @@ export function PageTOC() {
       level: heading.tagName === 'H2' ? 2 : 3,
       id: heading.id,
       text: heading.innerText,
-    }));
+    })).filter(h => h.id);
     setHeadings(toc);
   }, []);
 
@@ -54,20 +54,22 @@ export function PageTOC() {
   }
 
   return (
-    <aside className="hidden lg:block w-56 shrink-0">
+    <aside className="hidden xl:block w-56 shrink-0">
       <div className="sticky top-24">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">
           On this page
         </h3>
-        <ul className="space-y-2 text-sm">
+        <ul className="space-y-1 text-sm">
           {headings.map(heading => (
             <li key={heading.id}>
               <a
                 href={`#${heading.id}`}
                 className={cn(
-                  'block text-muted-foreground hover:text-foreground transition-colors',
-                  heading.level === 3 && 'pl-4',
-                  activeId === heading.id && 'font-medium text-primary'
+                  'block border-l-2 py-1 pl-4 text-muted-foreground transition-colors hover:text-foreground hover:border-muted-foreground/50',
+                  heading.level === 3 && 'pl-8',
+                  activeId === heading.id
+                    ? 'border-primary font-medium text-primary'
+                    : 'border-transparent'
                 )}
               >
                 {heading.text}

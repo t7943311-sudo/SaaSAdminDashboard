@@ -18,7 +18,7 @@ export default function DocsLayout({
         </aside>
         <div className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_220px]">
           <main className="w-full">
-            <div className="prose prose-sm md:prose-base prose-invert max-w-none prose-headings:scroll-mt-20 prose-headings:font-semibold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-pre:bg-secondary/50 prose-code:bg-secondary/50 prose-code:p-1 prose-code:rounded">
+            <div className="prose prose-sm md:prose-base prose-invert max-w-none prose-headings:scroll-mt-20 prose-headings:font-semibold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-pre:bg-muted prose-code:bg-muted prose-code:p-1 prose-code:rounded">
               {children}
             </div>
           </main>
