@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero-dashboard-preview",
-      "description": "A preview of the LaunchBase dashboard UI.",
-      "imageUrl": "https://images.unsplash.com/photo-1765217833207-2059107afc85?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzYWFzJTIwZGFzaGJvYXJkfGVufDB8fHx8MTc2OTgwNDUwNHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "saas dashboard"
+      "description": "An image representing technology in education.",
+      "imageUrl": "https://www.eschoolnews.com/files/2024/12/k-12-tech-innovation-news.jpeg",
+      "imageHint": "education technology"
     },
     {
       "id": "product-preview-dashboard",

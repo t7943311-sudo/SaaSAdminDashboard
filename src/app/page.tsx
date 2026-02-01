@@ -284,7 +284,7 @@ export default function LandingPage() {
                 {heroImage && 
                     <Image 
                         src={heroImage.imageUrl} 
-                        alt="LaunchBase Dashboard Preview" 
+                        alt="Technology in education" 
                         width={1200}
                         height={800}
                         className="relative rounded-xl border border-border/20 shadow-2xl"
