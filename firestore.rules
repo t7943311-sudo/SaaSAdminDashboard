@@ -92,6 +92,18 @@ service cloud.firestore {
       }
 
       /**
+       * @description   Stores a user's invoices.
+       * @path          /users/{userId}/invoices/{invoiceId}
+       * @allow         (read) A user reading their own invoices.
+       * @allow         (write) Admins can manage invoices (e.g., for manual adjustments). In production, this should be a webhook.
+       * @principle     Enforces path-based ownership for reads, admin-only for writes.
+       */
+      match /invoices/{invoiceId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+
+      /**
        * @description   Stores a user's custom dashboard layouts.
        * @path          /users/{userId}/dashboardLayouts/{dashboardLayoutId}
        * @allow         A user managing their own layouts, or an admin.

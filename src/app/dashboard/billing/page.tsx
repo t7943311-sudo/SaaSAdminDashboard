@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Download } from "lucide-react";
+import { Check, Download, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import {
   Table,
@@ -18,201 +21,329 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-const plans = [
-  {
-    name: "Free",
-    price: "$0",
-    description: "For individuals and small projects getting started.",
-    features: [
-      "1 Project",
-      "500 AI Generations/mo",
-      "Basic Analytics",
-      "Community Support",
-    ],
-    isCurrent: false,
-    isPopular: false,
-  },
-  {
-    name: "Pro",
-    price: "$49",
-    description: "For growing businesses that need more power and support.",
-    features: [
-      "Unlimited Projects",
-      "5,000 AI Generations/mo",
-      "Advanced Analytics",
-      "Team Roles & Permissions",
-      "Priority Email Support",
-    ],
-    isCurrent: true,
-    isPopular: true,
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    description: "For large organizations with advanced security and support needs.",
-    features: [
-      "Everything in Pro",
-      "Unlimited AI Generations",
-      "Dedicated Account Manager",
-      "Custom Integrations & SSO",
-      "24/7 Priority Support",
-    ],
-    isCurrent: false,
-    isPopular: false,
-  },
-];
-
-const invoices = [
-  { id: "INV2024-001", date: "2024-07-01", amount: "$49.00", status: "Paid" },
-  { id: "INV2024-002", date: "2024-06-01", amount: "$49.00", status: "Paid" },
-  { id: "INV2024-003", date: "2024-05-01", amount: "$49.00", status: "Paid" },
-  { id: "INV2024-004", date: "2024-04-01", amount: "$49.00", status: "Paid" },
-  { id: "INV2024-005", date: "2024-03-01", amount: "$29.00", status: "Paid" },
-];
+import { Skeleton } from '@/components/ui/skeleton';
+import { useUser, useFirestore, useCollection, useMemoFirebase, errorEmitter, FirestorePermissionError } from '@/firebase';
+import { collection, query, where, doc, updateDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import type { Subscription, SubscriptionPlan, Invoice } from '@/lib/types';
+import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import { ChangePlanDialog } from '@/components/dashboard/billing/change-plan-dialog';
+import { CancelSubscriptionDialog } from '@/components/dashboard/billing/cancel-subscription-dialog';
 
 export default function BillingPage() {
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const { toast } = useToast();
+
+  const [isChangingPlan, setIsChangingPlan] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+
+  // Fetch all available plans
+  const plansQuery = useMemoFirebase(() => collection(firestore, 'subscriptionPlans'), [firestore]);
+  const { data: plans, isLoading: isLoadingPlans } = useCollection<SubscriptionPlan>(plansQuery);
+
+  // Fetch user's active subscription
+  const subscriptionQuery = useMemoFirebase(() => {
+    if (!user) return null;
+    return query(collection(firestore, `users/${user.uid}/subscriptions`), where("status", "in", ["active", "trialing", "past_due"]));
+  }, [firestore, user]);
+  const { data: subscriptions, isLoading: isLoadingSubscription } = useCollection<Subscription>(subscriptionQuery);
+  const activeSubscription = subscriptions?.[0];
+
+  // Fetch user's invoices
+  const invoicesQuery = useMemoFirebase(() => {
+      if (!user) return null;
+      return query(collection(firestore, `users/${user.uid}/invoices`));
+  }, [firestore, user]);
+  const { data: invoices, isLoading: isLoadingInvoices } = useCollection<Invoice>(invoicesQuery);
+
+  const currentPlan = plans?.find(p => p.id === activeSubscription?.planId);
+
+  const handlePlanSelect = (plan: SubscriptionPlan) => {
+    if (plan.id === currentPlan?.id) return;
+    if (plan.name === 'Enterprise') {
+        // In a real app, this would open a contact form or a different flow
+        toast({ title: 'Contact Sales', description: 'Please contact our sales team to learn more about the Enterprise plan.' });
+        return;
+    }
+    setSelectedPlan(plan);
+  };
+  
+  const handleChangePlan = () => {
+    if (!user || !activeSubscription || !selectedPlan) return;
+
+    setIsChangingPlan(true);
+    const subDocRef = doc(firestore, `users/${user.uid}/subscriptions/${activeSubscription.id}`);
+    
+    // In a real app, you would create a Stripe Checkout session here
+    // and handle the subscription update via a webhook.
+    // For this starter kit, we'll simulate the update directly.
+    updateDoc(subDocRef, {
+      planId: selectedPlan.id,
+      priceId: selectedPlan.priceId,
+      status: 'active',
+      cancelAtPeriodEnd: false, // Re-activate if it was cancelled
+      updatedAt: serverTimestamp(),
+      // You might also want to update currentPeriodStart/End here
+    })
+    .then(() => {
+      toast({ title: "Plan Changed", description: `You are now on the ${selectedPlan.name} plan.`});
+      setSelectedPlan(null);
+    })
+    .catch(e => {
+        const permissionError = new FirestorePermissionError({
+            path: subDocRef.path,
+            operation: 'update',
+            requestResourceData: { planId: selectedPlan.id, priceId: selectedPlan.priceId }
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not change your plan.' });
+    })
+    .finally(() => setIsChangingPlan(false));
+  };
+  
+  const handleCancelSubscription = () => {
+      if (!user || !activeSubscription) return;
+      setIsCancelling(true);
+      const subDocRef = doc(firestore, `users/${user.uid}/subscriptions/${activeSubscription.id}`);
+
+      updateDoc(subDocRef, {
+          cancelAtPeriodEnd: true,
+          updatedAt: serverTimestamp(),
+      })
+      .then(() => {
+          toast({ title: "Subscription Cancellation", description: "Your subscription will be cancelled at the end of your current billing period." });
+          setShowCancelDialog(false);
+      })
+      .catch(e => {
+          const permissionError = new FirestorePermissionError({
+              path: subDocRef.path,
+              operation: 'update',
+              requestResourceData: { cancelAtPeriodEnd: true }
+          });
+          errorEmitter.emit('permission-error', permissionError);
+          toast({ variant: 'destructive', title: 'Error', description: 'Could not cancel your subscription.' });
+      })
+      .finally(() => setIsCancelling(false));
+  };
+
+  const handleReactivateSubscription = () => {
+      if (!user || !activeSubscription) return;
+      const subDocRef = doc(firestore, `users/${user.uid}/subscriptions/${activeSubscription.id}`);
+      updateDoc(subDocRef, {
+          cancelAtPeriodEnd: false,
+          updatedAt: serverTimestamp(),
+      }).then(() => {
+          toast({ title: "Subscription Reactivated", description: "Your subscription has been reactivated." });
+      }).catch(e => {
+          toast({ variant: 'destructive', title: 'Error', description: 'Could not reactivate your subscription.' });
+      });
+  }
+
+  // Dummy usage data
+  const usage = {
+    generations: { used: 1200, limit: 5000 },
+    projects: { used: 8, limit: Infinity },
+  }
+
   return (
-    <div className="space-y-8">
-       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Billing &amp; Subscription</h1>
-        <p className="text-muted-foreground">Manage your plan, usage, and payment history.</p>
-      </div>
+    <>
+      <ChangePlanDialog 
+        isOpen={!!selectedPlan}
+        onOpenChange={() => setSelectedPlan(null)}
+        onConfirm={handleChangePlan}
+        isChanging={isChangingPlan}
+        fromPlan={currentPlan || null}
+        toPlan={selectedPlan}
+      />
+      {activeSubscription && <CancelSubscriptionDialog
+          isOpen={showCancelDialog}
+          onOpenChange={setShowCancelDialog}
+          onConfirm={handleCancelSubscription}
+          isCancelling={isCancelling}
+          subscription={activeSubscription}
+       />}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Current Plan</CardTitle>
-          <CardDescription>
-            You are currently on the <span className="font-semibold text-primary">Pro</span> plan.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <div className="flex justify-between mb-2">
-              <span className="text-sm text-muted-foreground">AI Generations</span>
-              <span className="text-sm font-medium">1,200 / 5,000 used</span>
-            </div>
-            <Progress value={(1200 / 5000) * 100} />
-          </div>
-          <div>
-            <div className="flex justify-between mb-2">
-              <span className="text-sm text-muted-foreground">Projects</span>
-              <span className="text-sm font-medium">8 / Unlimited</span>
-            </div>
-            <Progress value={100} />
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            Your plan renews on <span className="font-medium text-foreground">August 1, 2024</span>.
-          </p>
-          <Button variant="outline">Cancel Subscription</Button>
-        </CardFooter>
-      </Card>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold">Billing &amp; Subscription</h1>
+          <p className="text-muted-foreground">Manage your plan, usage, and payment history.</p>
+        </div>
 
-      <div className="text-center">
-        <h2 className="text-3xl font-bold tracking-tight">
-          Flexible plans for teams of all sizes
-        </h2>
-        <p className="mt-2 text-lg text-muted-foreground max-w-2xl mx-auto">
-          Choose the plan that’s right for you. All plans come with a
-          14-day free trial of our Pro features.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {plans.map((plan) => (
-          <Card
-            key={plan.name}
-            className={`flex flex-col relative ${
-              plan.isCurrent ? "border-primary ring-2 ring-primary" : ""
-            } ${plan.isPopular ? "border-primary" : ""}`}
-          >
-            {plan.isPopular && (
-              <Badge className="absolute -top-3 right-4">
-                Most Popular
-              </Badge>
+        <Card>
+          <CardHeader>
+            <CardTitle>Current Plan</CardTitle>
+            {isLoadingSubscription ? <Skeleton className="h-5 w-1/2 mt-1" /> : (
+              <CardDescription>
+                {currentPlan ? `You are currently on the ` : 'You are not subscribed to any plan.'}
+                {currentPlan && <span className="font-semibold text-primary">{currentPlan.name}</span>}
+                {activeSubscription?.cancelAtPeriodEnd && ' (Cancels on ' + format(activeSubscription.currentPeriodEnd.toDate(), 'PPP') + ')'}
+              </CardDescription>
             )}
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <div className="mb-4">
-                <span className="text-4xl font-bold">{plan.price}</span>
-                {plan.price.startsWith("$") && (
-                  <span className="text-muted-foreground">/month</span>
-                )}
+          </CardHeader>
+          {currentPlan && activeSubscription && (
+            <>
+            <CardContent className="space-y-6">
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-muted-foreground">AI Generations</span>
+                  <span className="text-sm font-medium">{usage.generations.used.toLocaleString()} / {usage.generations.limit.toLocaleString()} used</span>
+                </div>
+                <Progress value={(usage.generations.used / usage.generations.limit) * 100} />
               </div>
-              <CardDescription>{plan.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <ul className="space-y-4">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-center">
-                    <Check className="mr-2 h-4 w-4 text-green-500" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-muted-foreground">Projects</span>
+                  <span className="text-sm font-medium">{usage.projects.used} / Unlimited</span>
+                </div>
+                <Progress value={100} />
+              </div>
             </CardContent>
-            <CardFooter>
-              <Button
-                className="w-full"
-                variant={plan.isCurrent ? "outline" : plan.isPopular ? "default" : "secondary"}
-                disabled={plan.isCurrent}
-              >
-                {plan.isCurrent
-                  ? "Current Plan"
-                  : plan.name === "Enterprise"
-                  ? "Contact Sales"
-                  : "Upgrade to " + plan.name}
-              </Button>
+            <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <p className="text-sm text-muted-foreground">
+                Your plan renews on <span className="font-medium text-foreground">{format(activeSubscription.currentPeriodEnd.toDate(), 'PPP')}</span>.
+              </p>
+              {activeSubscription.cancelAtPeriodEnd ? (
+                  <Button variant="outline" onClick={handleReactivateSubscription}>Reactivate Subscription</Button>
+              ) : (
+                  <Button variant="outline" onClick={() => setShowCancelDialog(true)}>Cancel Subscription</Button>
+              )}
             </CardFooter>
-          </Card>
-        ))}
-      </div>
+            </>
+          )}
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Invoice History</CardTitle>
-          <CardDescription>View and download your past invoices.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Invoice ID</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {invoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell className="font-medium">{invoice.id}</TableCell>
-                  <TableCell>{invoice.date}</TableCell>
-                  <TableCell>{invoice.amount}</TableCell>
-                  <TableCell>
-                     <Badge variant={invoice.status === 'Paid' ? 'secondary' : 'destructive'}>
-                        <div className={`w-2 h-2 rounded-full mr-2 ${invoice.status === 'Paid' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                        {invoice.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon">
-                      <Download className="h-4 w-4" />
-                      <span className="sr-only">Download Invoice</span>
-                    </Button>
-                  </TableCell>
+        <div className="text-center">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Flexible plans for teams of all sizes
+          </h2>
+          <p className="mt-2 text-lg text-muted-foreground max-w-2xl mx-auto">
+            Choose the plan that’s right for you. All plans come with a
+            14-day free trial of our Pro features.
+          </p>
+        </div>
+
+        {isLoadingPlans ? (
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <Skeleton className="h-96 w-full" />
+                <Skeleton className="h-96 w-full" />
+                <Skeleton className="h-96 w-full" />
+            </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {plans?.sort((a,b) => a.price - b.price).map((plan) => (
+              <Card
+                key={plan.name}
+                className={`flex flex-col relative ${
+                  plan.id === currentPlan?.id ? "border-primary ring-2 ring-primary" : ""
+                } ${plan.isPopular ? "border-primary" : ""}`}
+              >
+                {plan.isPopular && (
+                  <Badge className="absolute -top-3 right-4">
+                    Most Popular
+                  </Badge>
+                )}
+                <CardHeader>
+                  <CardTitle>{plan.name}</CardTitle>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold">${plan.price}</span>
+                    {plan.price > 0 && (
+                      <span className="text-muted-foreground">/month</span>
+                    )}
+                  </div>
+                  <CardDescription>{plan.features[0]}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <ul className="space-y-4">
+                    {plan.features.slice(1).map((feature) => (
+                      <li key={feature} className="flex items-center">
+                        <Check className="mr-2 h-4 w-4 text-green-500" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    className="w-full"
+                    variant={plan.id === currentPlan?.id ? "outline" : plan.isPopular ? "default" : "secondary"}
+                    disabled={plan.id === currentPlan?.id || isLoadingSubscription}
+                    onClick={() => handlePlanSelect(plan)}
+                  >
+                    {isLoadingSubscription ? <Loader2 className="animate-spin" /> : (
+                      plan.id === currentPlan?.id
+                        ? "Current Plan"
+                        : plan.name === "Enterprise"
+                        ? "Contact Sales"
+                        : currentPlan && plan.price > currentPlan.price ? "Upgrade to " + plan.name : "Downgrade to " + plan.name
+                    )}
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Invoice History</CardTitle>
+            <CardDescription>View and download your past invoices.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Invoice ID</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-         <CardFooter className="flex justify-end">
-            <Button variant="outline">View All Invoices</Button>
-        </CardFooter>
-      </Card>
-    </div>
+              </TableHeader>
+              <TableBody>
+                {isLoadingInvoices ? (
+                    <TableRow>
+                        <TableCell colSpan={5} className="py-8">
+                            <div className="flex justify-center"><Loader2 className="animate-spin" /></div>
+                        </TableCell>
+                    </TableRow>
+                ) : invoices && invoices.length > 0 ? (
+                  invoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-medium">#{invoice.id.substring(0, 7)}</TableCell>
+                      <TableCell>{format(invoice.date.toDate(), 'PPP')}</TableCell>
+                      <TableCell>${(invoice.amount / 100).toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Badge variant={invoice.status === 'paid' ? 'secondary' : 'destructive'}>
+                            <div className={`w-2 h-2 rounded-full mr-2 ${invoice.status === 'paid' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" asChild>
+                          <a href={invoice.invoiceUrl} target="_blank" rel="noopener noreferrer">
+                            <Download className="h-4 w-4" />
+                            <span className="sr-only">Download Invoice</span>
+                          </a>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                    <TableRow>
+                        <TableCell colSpan={5} className="text-center h-24">No invoices found.</TableCell>
+                    </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+           <CardFooter className="flex justify-end">
+              <Button variant="outline">View All Invoices</Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </>
   );
 }

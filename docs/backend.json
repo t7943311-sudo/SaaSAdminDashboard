@@ -81,7 +81,11 @@
         },
         "price": {
           "type": "number",
-          "description": "Price of the subscription plan."
+          "description": "Price of the subscription plan in dollars."
+        },
+        "priceId": {
+          "type": "string",
+          "description": "The ID of the price object in the payment provider (e.g., Stripe)."
         },
         "features": {
           "type": "array",
@@ -89,12 +93,17 @@
           "items": {
             "type": "string"
           }
+        },
+        "isPopular": {
+          "type": "boolean",
+          "description": "Whether this plan should be highlighted as popular."
         }
       },
       "required": [
         "id",
         "name",
         "price",
+        "priceId",
         "features"
       ]
     },
@@ -110,33 +119,96 @@
         },
         "userId": {
           "type": "string",
-          "description": "Reference to the User entity. (Relationship: User 1:N Subscription)"
+          "description": "Reference to the User entity."
         },
-        "subscriptionPlanId": {
+        "planId": {
           "type": "string",
-          "description": "Reference to the SubscriptionPlan entity. (Relationship: SubscriptionPlan 1:N Subscription)"
+          "description": "Reference to the SubscriptionPlan entity ID."
         },
-        "startDate": {
+        "priceId": {
           "type": "string",
-          "description": "Start date of the subscription.",
+          "description": "The ID of the price object from the payment provider."
+        },
+        "currentPeriodStart": {
+          "type": "string",
+          "description": "Start date of the current subscription period.",
           "format": "date-time"
         },
-        "endDate": {
+        "currentPeriodEnd": {
           "type": "string",
-          "description": "End date of the subscription.",
+          "description": "End date of the current subscription period.",
           "format": "date-time"
         },
         "status": {
           "type": "string",
-          "description": "Status of the subscription (e.g., Active, Cancelled)."
+          "description": "Status of the subscription (e.g., active, trialing, canceled).",
+          "enum": [
+            "active",
+            "trialing",
+            "past_due",
+            "canceled"
+          ]
+        },
+        "cancelAtPeriodEnd": {
+          "type": "boolean",
+          "description": "If true, the subscription will be canceled at the end of the current period."
         }
       },
       "required": [
         "id",
         "userId",
-        "subscriptionPlanId",
-        "startDate",
-        "endDate",
+        "planId",
+        "priceId",
+        "status"
+      ]
+    },
+    "Invoice": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Invoice",
+      "type": "object",
+      "description": "Represents a billing invoice.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the invoice."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User entity."
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "Reference to the Subscription entity."
+        },
+        "date": {
+          "type": "string",
+          "description": "Date the invoice was created.",
+          "format": "date-time"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Total amount of the invoice in cents."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the invoice.",
+          "enum": [
+            "paid",
+            "open",
+            "void"
+          ]
+        },
+        "invoiceUrl": {
+          "type": "string",
+          "description": "URL to view the invoice on the payment provider's site."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "subscriptionId",
+        "date",
+        "amount",
         "status"
       ]
     },
@@ -300,6 +372,26 @@
         }
       },
       {
+        "path": "/users/{userId}/invoices/{invoiceId}",
+        "definition": {
+          "entityName": "Invoice",
+          "schema": {
+            "$ref": "#/backend/entities/Invoice"
+          },
+          "description": "Stores user invoices. Path-based ownership ensures only the user can access their invoices.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "invoiceId",
+              "description": "The unique identifier of the invoice."
+            }
+          ]
+        }
+      },
+      {
         "path": "/users/{userId}/dashboardLayouts/{dashboardLayoutId}",
         "definition": {
           "entityName": "DashboardLayout",
@@ -388,6 +480,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to ensure security, scalability, and ease of debugging, following the principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters). Authorization Independence is achieved through denormalization. For example, access to Templates depends on the user. The `userId` is duplicated within the Template documents so that rules do not need to `get()` parent user documents to check ownership. This ensures atomic operations and simplifies security rules. Structural Segregation is used to ensure that each collection has a homogeneous security posture. For instance, user-specific data (templates, dashboard layouts) are stored in user-owned subcollections.  Access Modeling utilizes path-based ownership for private user data (`/users/{userId}/templates/{templateId}`). Membership Maps are not required in this data model, as there is no collaborative data.\n\nThe structure also facilitates QAPs by structuring data such that list operations can be securely filtered based on path-based ownership."
+    "reasoning": "The Firestore structure is designed to ensure security, scalability, and ease of debugging, following the principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters). Authorization Independence is achieved through denormalization. For example, access to Templates, Subscriptions, and Invoices depends on the user. The `userId` is duplicated within these documents so that rules do not need to `get()` parent user documents to check ownership. This ensures atomic operations and simplifies security rules. Structural Segregation is used to ensure that each collection has a homogeneous security posture. For instance, user-specific data (templates, dashboard layouts, subscriptions, invoices) are stored in user-owned subcollections.  Access Modeling utilizes path-based ownership for private user data (`/users/{userId}/templates/{templateId}`). Membership Maps are not required in this data model, as there is no collaborative data.\n\nThe structure also facilitates QAPs by structuring data such that list operations can be securely filtered based on path-based ownership."
   }
 }
