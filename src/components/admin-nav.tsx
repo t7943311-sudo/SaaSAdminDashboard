@@ -23,7 +23,7 @@ import {
 const navItems = [
   { href: "/admin", icon: <LayoutDashboard />, label: "Overview" },
   { href: "/admin/users", icon: <Users />, label: "Users" },
-  { href: "/admin/users", icon: <Building />, label: "Workspaces" },
+  { href: "/admin/workspaces", icon: <Building />, label: "Workspaces" },
   { href: "/admin/billing", icon: <CreditCard />, label: "Billing" },
   { href: "/admin/subscriptions", icon: <DollarSign />, label: "Subscriptions" },
   { href: "/admin/system-health", icon: <HeartPulse />, label: "System Health" },
