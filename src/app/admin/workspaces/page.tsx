@@ -1,4 +1,3 @@
-
 "use client"
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -130,7 +129,7 @@ export default function AdminWorkspacesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Workspace</TableHead>
-                  <TableHead>Admin / Owner</TableHead>
+                  <TableHead>Admin or Owner</TableHead>
                   <TableHead>Members</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -205,6 +204,5 @@ export default function AdminWorkspacesPage() {
           </CardContent>
         </Card>
       </div>
-    </>
   );
 }
