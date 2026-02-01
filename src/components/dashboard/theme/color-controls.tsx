@@ -8,8 +8,8 @@ interface ColorControlsProps {
 }
 
 const coreColors = ['primary', 'secondary', 'accent', 'destructive'];
-const backgroundColors = ['background', 'foreground', 'card', 'card-foreground', 'popover', 'popover-foreground'];
-const utilityColors = ['muted', 'muted-foreground', 'border', 'input', 'ring'];
+const backgroundColors = ['background', 'foreground', 'card', 'cardForeground', 'popover', 'popoverForeground'];
+const utilityColors = ['muted', 'mutedForeground', 'border', 'input', 'ring'];
 
 
 export function ColorControls({ theme, onColorChange }: ColorControlsProps) {
