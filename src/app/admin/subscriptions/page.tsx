@@ -28,10 +28,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, collectionGroup, query } from 'firebase/firestore';
+import { collection, collectionGroup, query, Timestamp } from 'firebase/firestore';
 import type { Subscription, User as FirebaseUser, SubscriptionPlan } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { format, add, sub } from 'date-fns';
 
 type EnrichedSubscription = Subscription & {
     user: {
@@ -45,6 +45,29 @@ type EnrichedSubscription = Subscription & {
     }
 };
 
+// --- DEMO DATA ---
+const demoUsers: FirebaseUser[] = [
+    { id: 'user-demo-1', firstName: 'Alice', lastName: 'Johnson', email: 'alice@democorp.com', workspaceName: 'DemoCorp', role: 'admin', status: 'Active', createdAt: Timestamp.now(), updatedAt: Timestamp.now(), onboardingCompleted: true },
+    { id: 'user-demo-2', firstName: 'Bob', lastName: 'Smith', email: 'bob@democorp.com', workspaceName: 'DemoCorp', role: 'member', status: 'Active', createdAt: Timestamp.now(), updatedAt: Timestamp.now(), onboardingCompleted: true },
+    { id: 'user-demo-3', firstName: 'Charlie', lastName: 'Brown', email: 'charlie@startupdemo.io', workspaceName: 'Startup Demo', role: 'member', status: 'Pending', createdAt: Timestamp.now(), updatedAt: Timestamp.now(), onboardingCompleted: false },
+    { id: 'user-demo-4', firstName: 'Diana', lastName: 'Prince', email: 'diana@freelancedemo.co', workspaceName: 'Freelance Demo', role: 'member', status: 'Active', createdAt: Timestamp.now(), updatedAt: Timestamp.now(), onboardingCompleted: true },
+];
+
+const demoPlans: SubscriptionPlan[] = [
+  { id: 'plan_free_demo', name: 'Free', price: 0, priceId: 'price_free_demo', features: [] },
+  { id: 'plan_pro_demo', name: 'Pro', price: 29, priceId: 'price_pro_demo', features: [], isPopular: true },
+  { id: 'plan_enterprise_demo', name: 'Enterprise', price: 99, priceId: 'price_enterprise_demo', features: [] },
+];
+
+const demoSubscriptions: Subscription[] = [
+  { id: 'sub-demo-1', userId: 'user-demo-1', planId: 'plan_pro_demo', status: 'active', cancelAtPeriodEnd: false, currentPeriodStart: Timestamp.fromDate(sub(new Date(), {days: 10})), currentPeriodEnd: Timestamp.fromDate(add(new Date(), {days: 20})), createdAt: Timestamp.now(), updatedAt: Timestamp.now() },
+  { id: 'sub-demo-2', userId: 'user-demo-2', planId: 'plan_pro_demo', status: 'active', cancelAtPeriodEnd: true, currentPeriodStart: Timestamp.fromDate(sub(new Date(), {days: 5})), currentPeriodEnd: Timestamp.fromDate(add(new Date(), {days: 25})), createdAt: Timestamp.now(), updatedAt: Timestamp.now() },
+  { id: 'sub-demo-3', userId: 'user-demo-3', planId: 'plan_enterprise_demo', status: 'trialing', cancelAtPeriodEnd: false, currentPeriodStart: Timestamp.fromDate(sub(new Date(), {days: 2})), currentPeriodEnd: Timestamp.fromDate(add(new Date(), {days: 12})), createdAt: Timestamp.now(), updatedAt: Timestamp.now() },
+  { id: 'sub-demo-4', userId: 'user-demo-4', planId: 'plan_free_demo', status: 'canceled', cancelAtPeriodEnd: false, currentPeriodStart: Timestamp.fromDate(sub(new Date(), {months: 2})), currentPeriodEnd: Timestamp.fromDate(sub(new Date(), {months: 1})), createdAt: Timestamp.now(), updatedAt: Timestamp.now() },
+];
+// --- END DEMO DATA ---
+
+
 export default function AdminSubscriptionsPage() {
     const firestore = useFirestore();
     const router = useRouter();
@@ -52,16 +75,22 @@ export default function AdminSubscriptionsPage() {
     const [searchTerm, setSearchTerm] = useState('');
 
     const subscriptionsQuery = useMemoFirebase(() => query(collectionGroup(firestore, 'subscriptions')), [firestore]);
-    const { data: subscriptions, isLoading: isLoadingSubscriptions, error: subscriptionsError } = useCollection<Subscription>(subscriptionsQuery);
+    const { data: subscriptionsFromDb, isLoading: isLoadingSubscriptions, error: subscriptionsError } = useCollection<Subscription>(subscriptionsQuery);
 
     const usersQuery = useMemoFirebase(() => collection(firestore, 'users'), [firestore]);
-    const { data: users, isLoading: isLoadingUsers, error: usersError } = useCollection<FirebaseUser>(usersQuery);
+    const { data: usersFromDb, isLoading: isLoadingUsers, error: usersError } = useCollection<FirebaseUser>(usersQuery);
 
     const plansQuery = useMemoFirebase(() => collection(firestore, 'subscriptionPlans'), [firestore]);
-    const { data: plans, isLoading: isLoadingPlans, error: plansError } = useCollection<SubscriptionPlan>(plansQuery);
+    const { data: plansFromDb, isLoading: isLoadingPlans, error: plansError } = useCollection<SubscriptionPlan>(plansQuery);
     
     const isLoading = isLoadingSubscriptions || isLoadingUsers || isLoadingPlans;
     const error = subscriptionsError || usersError || plansError;
+
+    const useDemoData = !isLoading && !error && (!subscriptionsFromDb || subscriptionsFromDb.length === 0);
+
+    const subscriptions = useDemoData ? demoSubscriptions : subscriptionsFromDb;
+    const users = useDemoData ? demoUsers : usersFromDb;
+    const plans = useDemoData ? demoPlans : plansFromDb;
 
     const enrichedSubscriptions = useMemo(() => {
         if (!subscriptions || !users || !plans) return [];
@@ -99,10 +128,18 @@ export default function AdminSubscriptionsPage() {
     const handleAction = (action: string, sub: EnrichedSubscription) => {
         switch(action) {
             case 'view-user':
+                if (useDemoData) {
+                    toast({ title: 'Demo Action', description: 'This action is disabled in demo mode.' });
+                    return;
+                }
                 router.push(`/admin/users/${sub.userId}`);
                 break;
             case 'view-workspace':
                  if (sub.workspace !== 'N/A') {
+                    if (useDemoData) {
+                        toast({ title: 'Demo Action', description: 'This action is disabled in demo mode.' });
+                        return;
+                    }
                     router.push(`/admin/workspaces/${encodeURIComponent(sub.workspace)}`);
                 } else {
                     toast({ variant: 'destructive', title: 'No Workspace', description: 'This user is not associated with a workspace.' });
@@ -118,7 +155,10 @@ export default function AdminSubscriptionsPage() {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold">Global Subscriptions</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold">
+                        Global Subscriptions
+                        {useDemoData && <Badge variant="outline" className="ml-2 text-sm">Demo Data</Badge>}
+                    </h1>
                     <p className="text-muted-foreground">View and manage all active subscriptions on the platform.</p>
                 </div>
                 <Button variant="outline">
@@ -193,7 +233,8 @@ export default function AdminSubscriptionsPage() {
                                         } className="capitalize">
                                             <div className={`w-2 h-2 mr-2 rounded-full ${
                                                 sub.status === 'active' ? 'bg-green-500' :
-                                                sub.status === 'trialing' ? 'bg-amber-500' : 'bg-red-500'
+                                                sub.status === 'trialing' ? 'bg-amber-500' :
+                                                sub.status === 'canceled' ? 'bg-red-500' : 'bg-gray-500'
                                             }`}></div>
                                             {sub.cancelAtPeriodEnd ? 'Cancels' : sub.status.replace('_', ' ')}
                                         </Badge>
