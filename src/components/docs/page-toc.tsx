@@ -65,10 +65,10 @@ export function PageTOC() {
               <a
                 href={`#${heading.id}`}
                 className={cn(
-                  'block border-l-2 py-1 pl-4 text-muted-foreground transition-colors hover:text-foreground hover:border-muted-foreground/50',
+                  'block rounded-md border-l-2 py-1 pl-4 text-muted-foreground transition-colors hover:text-foreground hover:border-muted-foreground/50',
                   heading.level === 3 && 'pl-8',
                   activeId === heading.id
-                    ? 'border-primary font-medium text-primary'
+                    ? 'border-primary font-semibold text-primary bg-primary/10'
                     : 'border-transparent'
                 )}
               >

@@ -22,15 +22,15 @@ import {
 
 const navItems = [
   {
-    heading: 'Getting Started',
+    heading: 'Introduction',
     items: [
         {
-            label: 'Introduction',
+            label: 'Welcome',
             icon: <Book className="h-4 w-4" />,
             href: '/docs',
         },
         {
-            label: 'Installation & Setup',
+            label: 'Quickstart',
             icon: <Rocket className="h-4 w-4" />,
             href: '/docs/getting-started',
         },
@@ -55,7 +55,7 @@ const navItems = [
             href: '/docs/onboarding',
         },
         {
-            label: 'Dashboard Guide',
+            label: 'Dashboard',
             icon: <LayoutDashboard className="h-4 w-4" />,
             href: '/docs/dashboard',
         },
@@ -65,7 +65,7 @@ const navItems = [
             href: '/docs/admin-panel',
         },
         {
-            label: 'Billing & Subscriptions',
+            label: 'Billing',
             icon: <CreditCard className="h-4 w-4" />,
             href: '/docs/billing',
         },
@@ -84,20 +84,10 @@ const navItems = [
             icon: <Palette className="h-4 w-4" />,
             href: '/docs/theme-builder',
         },
-        {
-            label: 'Demo Mode',
-            icon: <Eye className="h-4 w-4" />,
-            href: '/docs/demo-mode',
-        },
-        {
-            label: 'Global States',
-            icon: <ServerCrash className="h-4 w-4" />,
-            href: '/docs/global-states',
-        },
     ]
   },
   {
-      heading: 'API & Webhooks',
+      heading: 'API',
       items: [
         {
             label: 'API Reference',
@@ -109,7 +99,22 @@ const navItems = [
             icon: <Webhook className="h-4 w-4" />,
             href: '/docs/webhooks',
         },
+      ]
+  },
+  {
+      heading: 'Advanced',
+      items: [
+         {
+            label: 'Demo Mode',
+            icon: <Eye className="h-4 w-4" />,
+            href: '/docs/demo-mode',
+        },
         {
+            label: 'Global States',
+            icon: <ServerCrash className="h-4 w-4" />,
+            href: '/docs/global-states',
+        },
+         {
             label: 'Errors',
             icon: <AlertOctagon className="h-4 w-4" />,
             href: '/docs/errors',

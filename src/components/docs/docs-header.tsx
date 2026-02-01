@@ -29,10 +29,13 @@ export function DocsHeader({ sectionTitle = "Docs" }: { sectionTitle?: string })
                 Docs
              </Link>
              <Link href="/docs/api-reference" className="text-muted-foreground hover:text-foreground">
-                API
+                API Reference
              </Link>
-             <Link href="/legal" className="text-muted-foreground hover:text-foreground">
-                Legal
+             <Link href="/docs" className="text-muted-foreground hover:text-foreground opacity-50 cursor-not-allowed">
+                SDKs
+             </Link>
+              <Link href="/docs/webhooks" className="text-muted-foreground hover:text-foreground">
+                Webhooks
              </Link>
         </nav>
 
