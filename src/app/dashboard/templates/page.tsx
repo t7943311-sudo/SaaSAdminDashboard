@@ -1,7 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
-import { useEffect, useRef } from "react";
+import { useFormStatus } from "react-dom";
+import { useEffect, useRef, useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -45,7 +45,7 @@ export default function TemplatesPage() {
   const { user } = useUser();
   const firestore = useFirestore();
   const initialState = { success: false, message: "", template: "", prompt: "" };
-  const [state, formAction] = useFormState(generateTemplate, initialState);
+  const [state, formAction] = useActionState(generateTemplate, initialState);
   const savedPromptRef = useRef<string | undefined>();
 
   useEffect(() => {
