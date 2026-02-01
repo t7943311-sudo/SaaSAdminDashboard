@@ -27,8 +27,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
-import { collection, doc, deleteDoc } from "firebase/firestore";
+import { useUser, useCollection, useFirestore, useMemoFirebase, useDoc } from "@/firebase";
+import { collection, doc, deleteDoc, query, where } from "firebase/firestore";
 import type { User as FirebaseUserEntity } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { InviteUserDialog } from "@/components/dashboard/users/invite-user-dialog";
@@ -78,8 +78,19 @@ export default function UsersPage() {
     const firestore = useFirestore();
     const router = useRouter();
     const { toast } = useToast();
-    const usersCollection = useMemoFirebase(() => collection(firestore, 'users'), [firestore]);
-    const { data: users, isLoading, error } = useCollection<FirebaseUserEntity>(usersCollection);
+    const { user: currentUser } = useUser();
+
+    const userDocRef = useMemoFirebase(() => currentUser ? doc(firestore, 'users', currentUser.uid) : null, [firestore, currentUser]);
+    const { data: userProfile, isLoading: isLoadingProfile } = useDoc<FirebaseUserEntity>(userDocRef);
+
+    const usersInWorkspaceQuery = useMemoFirebase(() => {
+        if (!userProfile?.workspaceName) return null;
+        return query(collection(firestore, 'users'), where('workspaceName', '==', userProfile.workspaceName));
+    }, [firestore, userProfile]);
+
+    const { data: users, isLoading: isLoadingUsers, error } = useCollection<FirebaseUserEntity>(usersInWorkspaceQuery);
+    
+    const isLoading = isLoadingProfile || isLoadingUsers;
 
     const [searchTerm, setSearchTerm] = useState("");
     const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
@@ -156,7 +167,7 @@ export default function UsersPage() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Users & Teams</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Users &amp; Teams</h1>
               <p className="text-muted-foreground">Manage users, roles, and teams in your organization.</p>
           </div>
           <div className="flex gap-2">

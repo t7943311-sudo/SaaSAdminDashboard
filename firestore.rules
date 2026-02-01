@@ -12,8 +12,9 @@
  * - User Isolation: A user can always access documents within their own `/users/{userId}` path.
  * - Admin Privilege: Users with `role == 'admin'` can read and write to most data for
  *   administrative purposes.
- * - No Public User Listing: To protect user privacy, only admin users can list all documents
- *   in the `/users` collection.
+ * - Team Visibility: Logged-in users can read the profiles of other users. This is necessary for
+ *   features like team management pages. For apps requiring stricter privacy, this can be changed
+ *   back to `allow read: if isOwner(userId) || isAdmin();`.
  * - Safe Deletion: Users are not permitted to delete their own user profile document directly.
  *   Account deletion should be handled by a secure backend process.
  *
@@ -77,16 +78,14 @@ service cloud.firestore {
     /**
      * @description   Stores user profile information.
      * @path          /users/{userId}
+     * @allow         (read) Any signed-in user can read profiles to allow for team features.
      * @allow         (create) An authenticated user creating their own profile document.
-     * @allow         (get) An authenticated user reading their own profile, or an admin reading any profile.
      * @allow         (update) An authenticated user updating their own profile, or an admin updating any profile.
-     * @allow         (list) An admin user listing all user profiles.
-     * @deny          (delete) A user trying to delete their own profile.
-     * @principle     Restricts access to a user's own data, but allows admins full read/write access.
+     * @allow         (delete) An admin can delete a user.
+     * @principle     Restricts write access, but allows reads for team visibility.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin();
+      allow read: if isSignedIn();
       allow create: if (isOwner(userId) || isAdmin()) && request.resource.data.id == userId;
       allow update: if (isOwner(userId) || isAdmin()) && request.resource.data.id == resource.data.id;
       allow delete: if isAdmin(); // Deletion should be an admin process
