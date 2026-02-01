@@ -17,12 +17,13 @@ import {
   CreditCard,
   UserPlus,
   ServerCrash,
-  Eye
+  Eye,
+  History
 } from 'lucide-react';
 
 const navItems = [
   {
-    heading: 'Getting Started',
+    heading: 'Overview',
     items: [
         {
             label: 'Introduction',
@@ -30,39 +31,34 @@ const navItems = [
             href: '/docs',
         },
         {
-            label: 'Quickstart',
-            icon: <Rocket className="h-4 w-4" />,
-            href: '/docs/getting-started',
-        },
-    ],
-  },
-  {
-      heading: 'Core Features',
-      items: [
-        {
             label: 'Core Concepts',
             icon: <Layers className="h-4 w-4" />,
             href: '/docs/core-concepts',
         },
+    ],
+  },
+  {
+      heading: 'Getting Started',
+      items: [
         {
-            label: 'Authentication',
-            icon: <KeyRound className="h-4 w-4" />,
-            href: '/docs/authentication',
+            label: 'Quickstart',
+            icon: <Rocket className="h-4 w-4" />,
+            href: '/docs/getting-started',
         },
         {
             label: 'Onboarding Flow',
             icon: <UserPlus className="h-4 w-4" />,
             href: '/docs/onboarding',
         },
+      ]
+  },
+  {
+      heading: 'User Guide',
+      items: [
         {
-            label: 'Dashboard Guide',
+            label: 'Dashboard',
             icon: <LayoutDashboard className="h-4 w-4" />,
             href: '/docs/dashboard',
-        },
-        {
-            label: 'Admin Panel',
-            icon: <Shield className="h-4 w-4" />,
-            href: '/docs/admin-panel',
         },
         {
             label: 'Billing',
@@ -70,25 +66,30 @@ const navItems = [
             href: '/docs/billing',
         },
         {
-            label: 'AI & Genkit',
-            icon: <Bot className="h-4 w-4" />,
-            href: '/docs/ai-and-genkit',
+            label: 'Admin Panel',
+            icon: <Shield className="h-4 w-4" />,
+            href: '/docs/admin-panel',
         },
       ]
   },
   {
-    heading: 'Customization',
-    items: [
+      heading: 'Developer Guide',
+      items: [
+        {
+            label: 'Authentication',
+            icon: <KeyRound className="h-4 w-4" />,
+            href: '/docs/authentication',
+        },
+        {
+            label: 'AI & Genkit',
+            icon: <Bot className="h-4 w-4" />,
+            href: '/docs/ai-and-genkit',
+        },
         {
             label: 'Theme Builder',
             icon: <Palette className="h-4 w-4" />,
             href: '/docs/theme-builder',
         },
-    ]
-  },
-  {
-      heading: 'API',
-      items: [
         {
             label: 'API Reference',
             icon: <Book className="h-4 w-4" />,
@@ -102,7 +103,7 @@ const navItems = [
       ]
   },
   {
-      heading: 'Guides',
+      heading: 'Reference',
       items: [
          {
             label: 'Demo Mode',
@@ -118,6 +119,11 @@ const navItems = [
             label: 'Errors',
             icon: <AlertOctagon className="h-4 w-4" />,
             href: '/docs/errors',
+        },
+         {
+            label: 'Changelog',
+            icon: <History className="h-4 w-4" />,
+            href: '/docs/changelog',
         },
       ]
   }

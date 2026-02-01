@@ -1,4 +1,4 @@
-import { FileText, Shield, Ban, ShieldCheck, History } from "lucide-react";
+import { FileText, Shield, Ban, ShieldCheck } from "lucide-react";
 import Link from 'next/link';
 
 export default function LegalCenterPage() {
@@ -37,13 +37,6 @@ export default function LegalCenterPage() {
                 <h3 className="font-semibold text-lg">Security Overview</h3>
             </div>
             <p className="text-muted-foreground">Our commitment to keeping your data safe and secure.</p>
-        </Link>
-         <Link href="/legal/changelog" className="group flex flex-col gap-3 rounded-lg border p-6 transition-colors hover:bg-muted/50">
-             <div className="flex items-center gap-3">
-                <History className="h-6 w-6 text-primary" />
-                <h3 className="font-semibold text-lg">Changelog</h3>
-            </div>
-            <p className="text-muted-foreground">Updates on the latest features and fixes.</p>
         </Link>
       </div>
 

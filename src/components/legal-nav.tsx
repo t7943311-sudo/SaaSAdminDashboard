@@ -9,7 +9,6 @@ import {
   Ban,
   Gavel,
   ShieldCheck,
-  History
 } from 'lucide-react';
 
 const navItems = [
@@ -37,11 +36,6 @@ const navItems = [
     label: 'Security',
     icon: <ShieldCheck className="h-4 w-4" />,
     href: '/legal/security',
-  },
-  {
-    label: 'Changelog',
-    icon: <History className="h-4 w-4" />,
-    href: '/legal/changelog',
   },
 ];
 
