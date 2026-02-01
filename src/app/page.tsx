@@ -259,7 +259,7 @@ export default function LandingPage() {
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="relative py-24 md:py-32">
+        <section className="relative flex items-center min-h-[calc(100dvh-4rem)]">
            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[60%] bg-primary/10 rounded-full blur-3xl -z-10"></div>
           <div className="container grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left">
