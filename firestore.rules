@@ -77,9 +77,9 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow create: if (isOwner(userId) || isAdmin()) && request.resource.data.id == userId;
       allow update: if (isOwner(userId) || isAdmin()) && request.resource.data.id == resource.data.id;
-      allow delete: if false; // Deletion should be a backend process
+      allow delete: if isAdmin(); // Deletion should be an admin process
 
       /**
        * @description   Stores a user's subscription history.

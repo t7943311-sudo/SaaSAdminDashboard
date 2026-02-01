@@ -18,7 +18,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, MoreVertical, PlusCircle, File } from "lucide-react";
+import { Search, MoreVertical, PlusCircle, File, UserPlus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +34,7 @@ import { useToast } from "@/hooks/use-toast";
 import { InviteUserDialog } from "@/components/dashboard/users/invite-user-dialog";
 import { RemoveUserAlert } from "@/components/dashboard/users/remove-user-alert";
 import { EditRoleDialog } from "@/components/dashboard/users/edit-role-dialog";
+import { AddUserDialog } from "@/components/dashboard/users/add-user-dialog";
 
 function exportToCsv(filename: string, rows: object[]) {
     if (!rows || !rows.length) {
@@ -81,6 +82,7 @@ export default function UsersPage() {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+    const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
     const [userToEdit, setUserToEdit] = useState<FirebaseUserEntity | null>(null);
     const [userToRemove, setUserToRemove] = useState<FirebaseUserEntity | null>(null);
     const [isRemoving, setIsRemoving] = useState(false);
@@ -137,6 +139,7 @@ export default function UsersPage() {
   return (
     <>
       <InviteUserDialog isOpen={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen} />
+      <AddUserDialog isOpen={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen} />
       <RemoveUserAlert 
           isOpen={!!userToRemove}
           onOpenChange={(isOpen) => !isOpen && setUserToRemove(null)}
@@ -160,9 +163,13 @@ export default function UsersPage() {
                   <File className="mr-2 h-4 w-4" />
                   Export
               </Button>
-              <Button onClick={() => setIsInviteDialogOpen(true)}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
+              <Button variant="outline" onClick={() => setIsInviteDialogOpen(true)}>
+                  <UserPlus className="mr-2 h-4 w-4" />
                   Invite User
+              </Button>
+              <Button onClick={() => setIsAddUserDialogOpen(true)}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add User
               </Button>
           </div>
         </div>
