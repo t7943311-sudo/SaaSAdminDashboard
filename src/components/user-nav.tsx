@@ -13,14 +13,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CreditCard, LogOut, User as UserIcon } from "lucide-react";
-import { useAuth, useUser } from "@/firebase";
+import { CreditCard, LogOut, User as UserIcon, Shield } from "lucide-react";
+import { useAuth, useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { signOut } from 'firebase/auth';
+import type { User as UserType } from '@/lib/types';
+import { doc } from "firebase/firestore";
 
 export function UserNav() {
   const { user } = useUser();
   const auth = useAuth();
+  const firestore = useFirestore();
   const router = useRouter();
+
+  const userDocRef = useMemoFirebase(() => {
+    if (!user) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user]);
+
+  const { data: userProfile } = useDoc<UserType>(userDocRef);
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -66,6 +76,17 @@ export function UserNav() {
              </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
+        {userProfile?.role === 'admin' && (
+          <>
+            <DropdownMenuSeparator />
+             <DropdownMenuItem asChild>
+               <Link href="/admin">
+                  <Shield className="mr-2 h-4 w-4" />
+                  <span>Admin Panel</span>
+               </Link>
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />

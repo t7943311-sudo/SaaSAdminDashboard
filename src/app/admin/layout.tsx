@@ -1,0 +1,107 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
+import { AdminNav } from "@/components/admin-nav";
+import { UserNav } from "@/components/user-nav";
+import { Logo } from "@/components/logo";
+import { Bell, Search, AlertTriangle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import type { User as UserType } from '@/lib/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+  const firestore = useFirestore();
+
+  const userDocRef = useMemoFirebase(() => {
+    if (!user) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user]);
+
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserType>(userDocRef);
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
+  
+  const isLoading = isUserLoading || isProfileLoading;
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-background">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+  
+  if (userProfile?.role !== 'admin') {
+      return (
+          <div className="flex h-screen w-screen items-center justify-center bg-background p-4">
+              <Card className="max-w-md w-full">
+                <CardHeader className="text-center">
+                    <div className="flex justify-center mb-4">
+                        <AlertTriangle className="w-12 h-12 text-destructive"/>
+                    </div>
+                    <CardTitle className="text-2xl">Access Denied</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                    <p className="text-muted-foreground mb-6">You do not have permission to access the admin panel.</p>
+                    <Button onClick={() => router.push('/dashboard')}>Return to Dashboard</Button>
+                </CardContent>
+              </Card>
+          </div>
+      )
+  }
+
+  return (
+    <SidebarProvider>
+      <Sidebar collapsible="icon">
+        <div className="flex flex-col h-full">
+            <div className="p-4 flex items-center gap-2">
+                <Logo className="w-8 h-8 text-destructive" />
+                <h1 className="text-xl font-bold group-data-[collapsible=icon]:hidden">Admin Panel</h1>
+            </div>
+            <AdminNav />
+        </div>
+      </Sidebar>
+      <SidebarInset>
+        <div className="flex flex-col h-full">
+          <header className="sticky top-0 z-10 flex h-[57px] items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4">
+            <SidebarTrigger className="md:hidden" />
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search anything..."
+                className="w-full rounded-lg bg-secondary pl-8 md:w-[200px] lg:w-[320px]"
+              />
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Bell className="h-4 w-4" />
+                <span className="sr-only">Toggle notifications</span>
+              </Button>
+              <UserNav />
+            </div>
+          </header>
+          <main className="flex-1 overflow-auto p-4 md:p-6 bg-muted/20">
+            {children}
+          </main>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
