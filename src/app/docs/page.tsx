@@ -10,12 +10,12 @@ export default function DocsIntroductionPage() {
         Welcome to the developer documentation for LaunchBase, the ultimate SaaS starter kit designed to help you go from idea to production in record time.
       </p>
       <p>
-        This documentation provides everything you need to understand the architecture, customize the components, and build on top of the provided foundation.
+        This documentation provides everything you need to understand the architecture, customize the components, and build on top of the provided foundation. Whether you're a solo developer, a startup, or an agency, LaunchBase is built to make your life easier.
       </p>
 
       <Callout>
         This documentation portal is part of the starter kit. You can customize
-        it to match your own brand and product.
+        it to match your own brand and product, or use it as a reference for building your own.
       </Callout>
 
       <h2 id="who-is-this-for">Who is this for?</h2>
@@ -38,7 +38,7 @@ export default function DocsIntroductionPage() {
         </li>
         <li>
           <strong>Established companies</strong> looking to modernize their
-          stack or build new internal tools.
+          stack or build new internal tools with a consistent design system.
         </li>
       </ul>
 
@@ -51,25 +51,24 @@ export default function DocsIntroductionPage() {
             <li><strong>UI Components:</strong> shadcn/ui</li>
             <li><strong>Database:</strong> Firebase Firestore</li>
             <li><strong>Authentication:</strong> Firebase Authentication</li>
-            <li><strong>AI:</strong> Genkit</li>
+            <li><strong>AI:</strong> Google Genkit</li>
         </ul>
 
-      <h2 id="key-concepts">Key Concepts</h2>
+      <h2 id="key-features">Key Features</h2>
       <p>
-        Before you dive in, it's helpful to understand a few core concepts that
-        form the foundation of this starter kit:
+        This starter kit comes packed with the features you'd otherwise spend weeks building yourself.
       </p>
       
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="flex flex-col gap-2 rounded-lg border p-4">
-                <Layers className="h-5 w-5 text-primary" />
-                <h4 className="font-semibold">Server-Centric Architecture</h4>
-                <p className="text-sm text-muted-foreground">Built on the Next.js App Router, allowing a mix of Server and Client Components for optimal performance.</p>
+                <Shield className="h-5 w-5 text-primary" />
+                <h4 className="font-semibold">Complete Authentication</h4>
+                <p className="text-sm text-muted-foreground">Secure sign-up, login, password-reset, and social login flows ready to go.</p>
             </div>
             <div className="flex flex-col gap-2 rounded-lg border p-4">
-                <Shield className="h-5 w-5 text-primary" />
-                <h4 className="font-semibold">Workspace-Based Multi-Tenancy</h4>
-                <p className="text-sm text-muted-foreground">The data model is designed around "Workspaces", allowing users to belong to different teams, each with its own isolated data.</p>
+                <Layers className="h-5 w-5 text-primary" />
+                <h4 className="font-semibold">Multi-Tenant Admin Panel</h4>
+                <p className="text-sm text-muted-foreground">Manage users, workspaces, billing, feature flags, and more from a secure admin dashboard.</p>
             </div>
         </div>
 

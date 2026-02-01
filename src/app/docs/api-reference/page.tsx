@@ -1,5 +1,6 @@
 import { EndpointCard } from '@/components/docs/endpoint-card';
 import { Callout } from '@/components/docs/callout';
+import Link from 'next/link';
 
 const usersEndpoints = [
   {
@@ -55,13 +56,17 @@ export default function ApiReferencePage() {
   return (
     <>
       <h1 id="api-reference">API Reference</h1>
-      <p>
+      <p className="lead">
         The LaunchBase API is organized around REST. Our API has predictable resource-oriented URLs, accepts JSON-encoded request bodies, returns JSON-encoded responses, and uses standard HTTP response codes, authentication, and verbs.
       </p>
-
+      
       <Callout>
-        All API requests must be authenticated with an API key. See the <a href="/docs/authentication">Authentication</a> section for details.
+        This API Reference is for demonstration purposes. The starter kit does not include a pre-built API backend, but is structured to make it easy for you to build one using Next.js Route Handlers.
       </Callout>
+
+      <p>
+        All API requests must be authenticated with an API key. See the <Link href="/docs/authentication">Authentication</Link> section for details on how to implement API key authentication.
+      </p>
 
       <h2 id="users-api">Users API</h2>
       <p>The Users API allows you to create, retrieve, and manage users in your application.</p>
@@ -69,7 +74,12 @@ export default function ApiReferencePage() {
       {usersEndpoints.map(endpoint => (
         <EndpointCard key={`${endpoint.method}-${endpoint.path}`} {...endpoint} />
       ))}
-      
+
+      <div className="mt-12 flex justify-end">
+        <Link href="/docs/webhooks" className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-semibold text-primary-foreground no-underline hover:bg-primary/90">
+            Next: Webhooks
+        </Link>
+      </div>
     </>
   );
 }

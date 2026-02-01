@@ -9,11 +9,15 @@ import {
   KeyRound,
   Webhook,
   AlertOctagon,
-  FileCode2,
   LayoutDashboard,
   Shield,
   Palette,
-  Layers
+  Layers,
+  Bot,
+  CreditCard,
+  UserPlus,
+  ServerCrash,
+  Eye
 } from 'lucide-react';
 
 const navItems = [
@@ -33,7 +37,7 @@ const navItems = [
     ],
   },
   {
-      heading: 'Guides',
+      heading: 'Core Features',
       items: [
         {
             label: 'Core Concepts',
@@ -46,7 +50,12 @@ const navItems = [
             href: '/docs/authentication',
         },
         {
-            label: 'Dashboard',
+            label: 'Onboarding Flow',
+            icon: <UserPlus className="h-4 w-4" />,
+            href: '/docs/onboarding',
+        },
+        {
+            label: 'Dashboard Guide',
             icon: <LayoutDashboard className="h-4 w-4" />,
             href: '/docs/dashboard',
         },
@@ -56,18 +65,43 @@ const navItems = [
             href: '/docs/admin-panel',
         },
         {
-            label: 'Theme Builder',
-            icon: <Palette className="h-4 w-4" />,
-            href: '/docs/theme-builder',
+            label: 'Billing & Subscriptions',
+            icon: <CreditCard className="h-4 w-4" />,
+            href: '/docs/billing',
+        },
+        {
+            label: 'AI & Genkit',
+            icon: <Bot className="h-4 w-4" />,
+            href: '/docs/ai-and-genkit',
         },
       ]
   },
   {
-      heading: 'API',
+    heading: 'Customization',
+    items: [
+        {
+            label: 'Theme Builder',
+            icon: <Palette className="h-4 w-4" />,
+            href: '/docs/theme-builder',
+        },
+        {
+            label: 'Demo Mode',
+            icon: <Eye className="h-4 w-4" />,
+            href: '/docs/demo-mode',
+        },
+        {
+            label: 'Global States',
+            icon: <ServerCrash className="h-4 w-4" />,
+            href: '/docs/global-states',
+        },
+    ]
+  },
+  {
+      heading: 'API & Webhooks',
       items: [
         {
             label: 'API Reference',
-            icon: <FileCode2 className="h-4 w-4" />,
+            icon: <Book className="h-4 w-4" />,
             href: '/docs/api-reference',
         },
         {

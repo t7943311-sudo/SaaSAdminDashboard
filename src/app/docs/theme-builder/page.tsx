@@ -7,7 +7,7 @@ export default function ThemeBuilderPage() {
     <>
       <h1 id="theme-builder">Theme Builder</h1>
       <p className="lead">
-        The Theme Builder is a powerful no-code tool that allows for deep customization of your application's visual appearance.
+        The Theme Builder is a powerful no-code tool included in LaunchBase that allows for deep customization of your application's visual appearance. This is a key feature for white-labeling your SaaS.
       </p>
 
       <h2 id="how-it-works">How It Works</h2>
@@ -15,10 +15,20 @@ export default function ThemeBuilderPage() {
         The application's theme is defined using CSS variables in <code>src/app/globals.css</code>. The Theme Builder, located at <code>/dashboard/theme</code>, provides a user-friendly interface to modify these variables in real-time.
       </p>
       <ul>
-        <li><strong>Live Preview:</strong> As you adjust colors or layout properties in the control panel, the changes are instantly applied to a preview area.</li>
+        <li><strong>Live Preview:</strong> As you adjust colors or layout properties in the control panel, the changes are instantly applied to a preview area filled with standard UI components.</li>
         <li><strong>CSS Generation:</strong> When you're satisfied with your changes, you can click "Get CSS Code" to generate a complete CSS stylesheet.</li>
         <li><strong>Applying the Theme:</strong> To make your changes permanent, copy the generated code and replace the entire content of your <code>src/app/globals.css</code> file.</li>
       </ul>
+      <CodeBlock code={`
+/* Example of generated CSS variables */
+:root {
+  --background: 220 39% 8%;
+  --foreground: 210 20% 98%;
+  --primary: 239 84% 69%;
+  /* ... and so on */
+  --radius: 1rem;
+}
+      `} lang="css" />
 
       <h2 id="customization-options">Customization Options</h2>
       <p>The Theme Builder allows you to control:</p>
@@ -43,8 +53,8 @@ export default function ThemeBuilderPage() {
       </ol>
 
       <div className="mt-12 flex justify-end">
-        <Link href="/docs/api-reference" className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-semibold text-primary-foreground no-underline hover:bg-primary/90">
-            Next: API Reference
+        <Link href="/docs/demo-mode" className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-semibold text-primary-foreground no-underline hover:bg-primary/90">
+            Next: Demo Mode
         </Link>
       </div>
     </>
