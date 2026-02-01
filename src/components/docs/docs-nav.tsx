@@ -22,10 +22,10 @@ import {
 
 const navItems = [
   {
-    heading: 'Introduction',
+    heading: 'Getting Started',
     items: [
         {
-            label: 'Welcome',
+            label: 'Introduction',
             icon: <Book className="h-4 w-4" />,
             href: '/docs',
         },
@@ -55,7 +55,7 @@ const navItems = [
             href: '/docs/onboarding',
         },
         {
-            label: 'Dashboard',
+            label: 'Dashboard Guide',
             icon: <LayoutDashboard className="h-4 w-4" />,
             href: '/docs/dashboard',
         },
@@ -102,7 +102,7 @@ const navItems = [
       ]
   },
   {
-      heading: 'Advanced',
+      heading: 'Guides',
       items: [
          {
             label: 'Demo Mode',
@@ -110,7 +110,7 @@ const navItems = [
             href: '/docs/demo-mode',
         },
         {
-            label: 'Global States',
+            label: 'Handling States',
             icon: <ServerCrash className="h-4 w-4" />,
             href: '/docs/global-states',
         },
