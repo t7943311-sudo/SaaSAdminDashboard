@@ -46,7 +46,7 @@ export default function UserDetailsPage() {
         <div className="text-muted-foreground">{icon}</div>
         <div>
             <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="font-medium">{value}</p>
+            <div className="font-medium">{value}</div>
         </div>
     </div>
   );
