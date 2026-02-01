@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from "next/link";
@@ -300,11 +301,23 @@ export default function LandingPage() {
             <p className="text-center text-sm font-semibold text-muted-foreground mb-6">
               BUILT WITH A MODERN, SCALABLE TECH STACK
             </p>
-            <div className="flex flex-wrap justify-center items-center gap-x-8 md:gap-x-12 gap-y-4 text-muted-foreground">
-              <NextJsLogo />
-              <FirebaseLogo />
-              <TypescriptLogo />
-              <TailwindLogo />
+            <div className="flex flex-wrap justify-center items-center gap-x-8 md:gap-x-12 gap-y-8 text-muted-foreground">
+              <div className="flex flex-col items-center gap-3">
+                <NextJsLogo />
+                <span className="text-sm font-medium">Next.js</span>
+              </div>
+              <div className="flex flex-col items-center gap-3">
+                <FirebaseLogo />
+                <span className="text-sm font-medium">Firebase</span>
+              </div>
+              <div className="flex flex-col items-center gap-3">
+                <TypescriptLogo />
+                <span className="text-sm font-medium">TypeScript</span>
+              </div>
+              <div className="flex flex-col items-center gap-3">
+                <TailwindLogo />
+                <span className="text-sm font-medium">Tailwind CSS</span>
+              </div>
             </div>
           </div>
         </section>
