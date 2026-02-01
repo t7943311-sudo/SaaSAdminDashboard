@@ -1,5 +1,6 @@
 "use client"
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -73,6 +74,7 @@ function exportToCsv(filename: string, rows: object[]) {
 
 export default function UsersPage() {
     const firestore = useFirestore();
+    const router = useRouter();
     const { toast } = useToast();
     const usersCollection = useMemoFirebase(() => collection(firestore, 'users'), [firestore]);
     const { data: users, isLoading, error } = useCollection<FirebaseUserEntity>(usersCollection);
@@ -110,8 +112,8 @@ export default function UsersPage() {
 
     const handleExport = () => {
       if (filteredUsers) {
-          const usersToExport = filteredUsers.map(({ id, avatar, ...rest }) => ({...rest}));
-          exportToCsv('users.csv', usersToExport);
+          const usersToExport = filteredUsers.map(({ id, avatar, ...rest }) => rest);
+          exportToCsv('users.csv', usersToExport as object[]);
       }
     };
 
@@ -240,7 +242,7 @@ export default function UsersPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => setUserToEdit(user)}>Edit Role</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log('// TODO: Implement user details view for', user.id)}>View Details</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => router.push(`/dashboard/users/${user.id}`)}>View Details</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-destructive" onClick={() => setUserToRemove(user)}>
                             Remove User
