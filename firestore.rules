@@ -159,5 +159,27 @@ service cloud.firestore {
       allow list: if isSignedIn();
       allow write: if isAdmin();
     }
+
+    /**
+     * @description   Stores global feature flags.
+     * @path          /featureFlags/{flagId}
+     * @allow         (read, write) Admins can manage feature flags.
+     * @principle     Secures administrative data by restricting access to admins only.
+     */
+    match /featureFlags/{flagId} {
+      allow read, write: if isAdmin();
+    }
+    
+    /**
+     * @description   Stores global platform settings.
+     * @path          /platform/{docId}
+     * @allow         (read, write) Admins can manage platform settings.
+     * @principle     Secures administrative data by restricting access to admins only.
+     */
+    match /platform/{docId} {
+      allow read, write: if isAdmin();
+    }
   }
 }
+
+    

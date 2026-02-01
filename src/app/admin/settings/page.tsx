@@ -1,13 +1,92 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc, setDoc } from 'firebase/firestore';
+import type { PlatformSettings } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Loader2 } from 'lucide-react';
+
+
+const DEFAULT_SETTINGS: PlatformSettings = {
+    id: 'settings',
+    sessionTimeout: 1440,
+    enforce2FA: false,
+    adminEmail: 'admins@example.com',
+    dailySummaryReport: true,
+    failedPaymentAlerts: true
+}
 
 export default function AdminSettingsPage() {
+    const firestore = useFirestore();
+    const settingsDocRef = useMemoFirebase(() => doc(firestore, 'platform', 'settings'), [firestore]);
+    const { data: settings, isLoading, error } = useDoc<PlatformSettings>(settingsDocRef);
+
+    const { toast } = useToast();
+    const [isSaving, setIsSaving] = useState(false);
+
+    // Form State
+    const [sessionTimeout, setSessionTimeout] = useState<number>(DEFAULT_SETTINGS.sessionTimeout);
+    const [enforce2FA, setEnforce2FA] = useState<boolean>(DEFAULT_SETTINGS.enforce2FA);
+    const [adminEmail, setAdminEmail] = useState<string>(DEFAULT_SETTINGS.adminEmail);
+    const [dailySummary, setDailySummary] = useState<boolean>(DEFAULT_SETTINGS.dailySummaryReport);
+    const [failedPayments, setFailedPayments] = useState<boolean>(DEFAULT_SETTINGS.failedPaymentAlerts);
+
+    useEffect(() => {
+        if (settings) {
+            setSessionTimeout(settings.sessionTimeout ?? DEFAULT_SETTINGS.sessionTimeout);
+            setEnforce2FA(settings.enforce2FA ?? DEFAULT_SETTINGS.enforce2FA);
+            setAdminEmail(settings.adminEmail ?? DEFAULT_SETTINGS.adminEmail);
+            setDailySummary(settings.dailySummaryReport ?? DEFAULT_SETTINGS.dailySummaryReport);
+            setFailedPayments(settings.failedPaymentAlerts ?? DEFAULT_SETTINGS.failedPaymentAlerts);
+        }
+    }, [settings]);
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await setDoc(settingsDocRef, {
+                sessionTimeout,
+                enforce2FA,
+                adminEmail,
+                dailySummaryReport: dailySummary,
+                failedPaymentAlerts: failedPayments,
+            }, { merge: true });
+            toast({ title: 'Saved!', description: 'Settings have been updated.' });
+        } catch (e: any) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Could not save settings.' });
+        } finally {
+            setIsSaving(false);
+        }
+    }
+
+    if (isLoading) {
+        return (
+            <div className="space-y-6">
+                <Skeleton className="h-12 w-1/3" />
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-6 w-1/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <Skeleton className="h-16 w-full" />
+                        <Skeleton className="h-10 w-1/3" />
+                    </CardContent>
+                    <CardFooter>
+                        <Skeleton className="h-10 w-24" />
+                    </CardFooter>
+                </Card>
+            </div>
+        )
+    }
+
     return (
         <div className="space-y-6">
             <div>
@@ -28,17 +107,14 @@ export default function AdminSettingsPage() {
                                 Require all users to set up 2FA to access their accounts.
                             </p>
                         </div>
-                        <Switch id="enforce-2fa" onClick={() => toast({ title: 'Feature coming soon!' })} />
+                        <Switch id="enforce-2fa" checked={enforce2FA} onCheckedChange={setEnforce2FA} />
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="session-timeout">Session Timeout (minutes)</Label>
-                        <Input id="session-timeout" type="number" defaultValue={1440} className="max-w-xs" />
+                        <Input id="session-timeout" type="number" value={sessionTimeout} onChange={(e) => setSessionTimeout(Number(e.target.value))} className="max-w-xs" />
                         <p className="text-sm text-muted-foreground">Automatically log users out after a period of inactivity.</p>
                     </div>
                 </CardContent>
-                <CardFooter>
-                    <Button onClick={() => toast({ title: 'Saved!', description: 'Security policies have been updated.' })}>Save Policies</Button>
-                </CardFooter>
             </Card>
 
             <Card>
@@ -49,7 +125,7 @@ export default function AdminSettingsPage() {
                 <CardContent className="space-y-6">
                      <div className="space-y-2">
                         <Label htmlFor="admin-email">Primary Admin Email</Label>
-                        <Input id="admin-email" type="email" defaultValue="admins@example.com" />
+                        <Input id="admin-email" type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} />
                         <p className="text-sm text-muted-foreground">Critical system alerts will be sent to this address.</p>
                     </div>
                     <Separator />
@@ -60,7 +136,7 @@ export default function AdminSettingsPage() {
                                 Send a daily summary of platform activity to the primary admin email.
                             </p>
                         </div>
-                        <Switch id="daily-summary" defaultChecked />
+                        <Switch id="daily-summary" checked={dailySummary} onCheckedChange={setDailySummary} />
                     </div>
                     <div className="flex items-center justify-between rounded-lg border p-4">
                         <div>
@@ -69,13 +145,19 @@ export default function AdminSettingsPage() {
                                 Get immediate notifications for failed subscription payments.
                             </p>
                         </div>
-                        <Switch id="failed-payments" defaultChecked />
+                        <Switch id="failed-payments" checked={failedPayments} onCheckedChange={setFailedPayments} />
                     </div>
                 </CardContent>
-                <CardFooter>
-                    <Button onClick={() => toast({ title: 'Saved!', description: 'Notification settings have been updated.' })}>Save Notification Settings</Button>
-                </CardFooter>
             </Card>
+            
+            <div className="flex justify-end">
+                <Button onClick={handleSave} disabled={isSaving}>
+                    {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Save All Settings
+                </Button>
+            </div>
         </div>
     )
 }
+
+    

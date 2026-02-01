@@ -46,3 +46,22 @@ export type Invoice = {
     status: 'paid' | 'open' | 'void';
     invoiceUrl?: string; // Link to Stripe invoice
 };
+
+export type FeatureFlag = {
+    id: string;
+    name: string;
+    status: boolean;
+    target: string;
+    modified: Timestamp;
+};
+
+export type PlatformSettings = {
+    id: string;
+    sessionTimeout: number;
+    enforce2FA: boolean;
+    adminEmail: string;
+    dailySummaryReport: boolean;
+    failedPaymentAlerts: boolean;
+};
+
+    
