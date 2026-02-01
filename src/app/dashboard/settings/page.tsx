@@ -61,9 +61,9 @@ const teamMembers = [
 ];
 
 const apiKeys = [
-    { name: 'Primary Live Key', key: 'pk_live_******************', created: 'Jan 1, 2024', lastUsed: '5m ago', scope: 'Full Access', status: 'Active' },
-    { name: 'Read-only Analytics Key', key: 'pk_live_******************', created: 'Feb 15, 2024', lastUsed: '2 days ago', scope: 'Read-only', status: 'Active' },
-    { name: 'Old Test Key', key: 'sk_test_******************', created: 'Dec 1, 2023', lastUsed: '3 months ago', scope: 'Test Data', status: 'Revoked' },
+    { id: 'key_1', name: 'Primary Live Key', key: 'pk_live_******************', created: 'Jan 1, 2024', lastUsed: '5m ago', scope: 'Full Access', status: 'Active' },
+    { id: 'key_2', name: 'Read-only Analytics Key', key: 'pk_live_******************', created: 'Feb 15, 2024', lastUsed: '2 days ago', scope: 'Read-only', status: 'Active' },
+    { id: 'key_3', name: 'Old Test Key', key: 'sk_test_******************', created: 'Dec 1, 2023', lastUsed: '3 months ago', scope: 'Test Data', status: 'Revoked' },
 ];
 
 const webhooks = [
@@ -467,7 +467,7 @@ export default function SettingsPage() {
                                     </TableHeader>
                                     <TableBody>
                                         {apiKeys.map((apiKey) => (
-                                        <TableRow key={apiKey.key}>
+                                        <TableRow key={apiKey.id}>
                                             <TableCell className="font-medium flex items-center gap-2">
                                                 <div className={`w-2 h-2 rounded-full ${apiKey.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`}></div>
                                                 {apiKey.name}
