@@ -138,6 +138,80 @@ export function PrimaryButton() {
 }
 `.trim();
 
+const NextJsLogo = () => (
+    <svg aria-label="Next.js logomark" role="img" viewBox="0 0 180 180" className="h-7 w-auto text-foreground">
+        <mask
+        id="a"
+        width="180"
+        height="180"
+        x="0"
+        y="0"
+        maskUnits="userSpaceOnUse"
+        style={{ maskType: "alpha" }}
+        >
+        <circle cx="90" cy="90" r="90" fill="currentColor"></circle>
+        </mask>
+        <g mask="url(#a)">
+        <circle
+            cx="90"
+            cy="90"
+            r="90"
+            data-circle="true"
+            stroke="currentColor"
+            strokeWidth="12"
+        ></circle>
+        <path
+            fill="currentColor"
+            d="M149.509 137.621C148.342 138.214 147.11 138.264 145.872 138.413C125.842 140.759 105.748 140.923 85.742 140.485C83.834 140.406 81.916 140.239 80.008 140.108C78.025 139.972 76.082 139.864 74.099 139.79C66.191 139.537 58.293 139.117 50.41 138.531C48.243 138.37 46.104 138.253 43.95 138.163C43.95 125.602 43.95 113.111 43.95 100.55C43.95 97.43 43.95 94.31 43.95 91.19C45.148 91.225 46.34 91.26 47.532 91.33C61.42 92.057 75.34 92.073 89.253 91.315C90.22 91.272 91.185 91.245 92.148 91.182C92.203 91.178 92.258 91.175 92.313 91.17C92.313 103.68 92.313 116.19 92.313 128.7C93.411 128.665 94.509 128.63 95.607 128.56C109.845 127.697 124.12 127.731 138.37 128.583C139.503 128.647 140.638 128.746 141.767 128.804C141.767 129.502 141.767 130.13 141.767 130.758C141.767 133.045 141.767 135.333 141.767 137.62C146.012 137.62 149.509 137.621 149.509 137.621Z"
+        ></path>
+        <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="12"
+            d="M101.962 111.666L125.64 88"
+        ></path>
+        </g>
+    </svg>
+)
+
+const FirebaseLogo = () => (
+    <svg aria-label="Firebase logomark" role="img" viewBox="0 0 18 26" className="h-7 w-auto">
+        <path
+        fill="#FFC24A"
+        d="M3.736 20.47l6.93-16.712L12.592 0 3.736 20.47z"
+        ></path>
+        <path fill="#FFA712" d="M0 21.65l3.736-1.18 3.553-8.6L0 21.65z"></path>
+        <path
+        fill="#F57C00"
+        d="M3.736 20.47l.15-.373.004-.008L3.736 20.47z"
+        ></path>
+        <path
+        fill="#F6820C"
+        d="M0 21.65l9.282-14.493L7.286 12.97 0 21.65z"
+        ></path>
+        <path fill="#FFCA28" d="M12.592 0L.92 25.132l2.816-4.662L12.592 0z"></path>
+    </svg>
+);
+
+const TypescriptLogo = () => (
+    <svg aria-label="TypeScript logomark" role="img" viewBox="0 0 128 128" className="h-7 w-auto">
+        <path fill="#3178C6" d="M121 1H7a6 6 0 0 0-6 6v114a6 6 0 0 0 6 6h114a6 6 0 0 0 6-6V7a6 6 0 0 0-6-6Z"></path>
+        <path fill="currentColor" d="m66.6 94.6-13.5-13.4-12.8 13.4H28.4L45.9 73.8 28.6 53.3h12.3l11.4 12.1 11.1-12.1H76L58.5 73.8 76.1 94.6z"></path>
+        <path fill="currentColor" d="M100.1 94.6V53.3h20.3v7.3H107v11.2h12.5v7.3H107v15.5z"></path>
+    </svg>
+)
+
+const TailwindLogo = () => (
+    <svg aria-label="Tailwind CSS logomark" role="img" viewBox="0 0 256 154" className="h-7 w-auto">
+        <path
+        fill="#38BDF8"
+        d="M128 0C93.867 0 72.533 17.067 64 51.2 76.8 34.133 91.733 27.733 108.8 32c9.734 2.4 16.8 11.2 24.534 19.2 7.733 8 16.8 12.8 28.266 12.8 28.267 0 42.667-23.467 34.134-51.2C182.933 5.333 158.933 0 128 0zM64 102.4C29.867 102.4 8.533 119.467 0 153.6c12.8-17.067 27.733-23.467 44.8-19.2 9.734 2.4 16.8 11.2 24.534 19.2 7.733 8 16.8 12.8 28.266 12.8 28.267 0 42.667-23.467 34.134-51.2-12.8-26.667-36.8-32-67.734-32z"
+        ></path>
+    </svg>
+)
+
+
 export default function LandingPage() {
   const { user, isUserLoading } = useUser();
   const heroImage = placeholderImages.find(p => p.id === "hero-dashboard-preview");
@@ -220,19 +294,19 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Social Proof */}
-        <section className="py-8">
-            <div className="container">
-                <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-center text-sm font-semibold text-muted-foreground">
-                    <span>Used by Indie Hackers</span>
-                    <span className="hidden md:block w-px h-6 bg-border"></span>
-                    <span>Built with Next.js & TypeScript</span>
-                    <span className="hidden md:block w-px h-6 bg-border"></span>
-                    <span>Production-Ready Architecture</span>
-                    <span className="hidden md:block w-px h-6 bg-border"></span>
-                    <span>Stripe & Prisma Integrated</span>
-                </div>
+        {/* Tech Stack Logos */}
+        <section className="py-12">
+          <div className="container">
+            <p className="text-center text-sm font-semibold text-muted-foreground mb-6">
+              BUILT WITH A MODERN, SCALABLE TECH STACK
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-x-8 md:gap-x-12 gap-y-4 text-muted-foreground">
+              <NextJsLogo />
+              <FirebaseLogo />
+              <TypescriptLogo />
+              <TailwindLogo />
             </div>
+          </div>
         </section>
 
 
