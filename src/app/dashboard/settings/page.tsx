@@ -121,7 +121,7 @@ export default function SettingsPage() {
   const { toast } = useToast();
 
   const userDocRef = useMemoFirebase(() => user ? doc(firestore, 'users', user.uid) : null, [firestore, user]);
-  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserType>(userDocRef);
+  const { data: userProfile, isLoading: isProfileLoading, error: profileError } = useDoc<UserType>(userDocRef);
 
   // Profile State
   const [name, setName] = useState('');
@@ -219,8 +219,14 @@ export default function SettingsPage() {
                 <Skeleton className="h-5 w-80 mt-2" />
             </div>
              <div className="flex flex-col md:flex-row gap-8">
-                <Skeleton className="w-full md:w-1/5 h-48" />
-                <Skeleton className="w-full md:w-4/5 h-96" />
+                <div className="w-full md:w-1/5 space-y-1"><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /></div>
+                <div className="w-full md:w-4/5">
+                    <Card><CardHeader><Skeleton className="h-6 w-1/4" /><Skeleton className="h-4 w-1/2 mt-2" /></CardHeader>
+                    <CardContent className="space-y-4 pt-6"><div className="flex items-center gap-4"><Skeleton className="h-20 w-20 rounded-full" /><Skeleton className="h-10 w-32" /></div>
+                    <Skeleton className="h-16 w-full" /></CardContent>
+                    <CardFooter><Skeleton className="h-10 w-24" /></CardFooter>
+                    </Card>
+                </div>
              </div>
         </div>
     )
@@ -234,6 +240,9 @@ export default function SettingsPage() {
           <h1 className="text-2xl md:text-3xl font-bold">Settings</h1>
           <p className="text-muted-foreground">Manage your account, workspace, and application settings.</p>
         </div>
+        
+        {profileError && <Card className="border-destructive"><CardHeader><CardTitle className="text-destructive">Error Loading Profile</CardTitle><CardDescription className="text-destructive">There was an issue fetching your profile data. Please try refreshing the page.</CardDescription></CardHeader></Card>}
+
         <Tabs defaultValue="profile" orientation="vertical" className="flex flex-col md:flex-row gap-8">
           <TabsList className="flex md:flex-col items-start justify-start h-auto bg-transparent p-0 border-b md:border-r md:border-b-0 w-full md:w-1/5 shrink-0">
             <TabsTrigger value="profile" className="w-full justify-start data-[state=active]:bg-muted">Profile</TabsTrigger>
@@ -466,7 +475,7 @@ export default function SettingsPage() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {apiKeys.map((apiKey) => (
+                                        {apiKeys.length > 0 ? apiKeys.map((apiKey) => (
                                         <TableRow key={apiKey.id}>
                                             <TableCell className="font-medium flex items-center gap-2">
                                                 <div className={`w-2 h-2 rounded-full ${apiKey.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`}></div>
@@ -488,7 +497,14 @@ export default function SettingsPage() {
                                                 </DropdownMenu>
                                             </TableCell>
                                         </TableRow>
-                                        ))}
+                                        )) : (
+                                          <TableRow>
+                                            <TableCell colSpan={6} className="text-center h-24">
+                                              <h3 className="font-semibold">No API keys yet.</h3>
+                                              <p className="text-muted-foreground text-sm">Generate your first key to get started.</p>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
                                     </TableBody>
                                 </Table>
                             </CardContent>
@@ -518,7 +534,7 @@ export default function SettingsPage() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {webhooks.map((webhook) => (
+                                        {webhooks.length > 0 ? webhooks.map((webhook) => (
                                             <TableRow key={webhook.id}>
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">
@@ -544,7 +560,14 @@ export default function SettingsPage() {
                                                     </DropdownMenu>
                                                 </TableCell>
                                             </TableRow>
-                                        ))}
+                                        )) : (
+                                          <TableRow>
+                                            <TableCell colSpan={4} className="text-center h-24">
+                                              <h3 className="font-semibold">No webhooks configured.</h3>
+                                              <p className="text-muted-foreground text-sm">Add a webhook to start receiving events.</p>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
                                     </TableBody>
                                 </Table>
                             </CardContent>

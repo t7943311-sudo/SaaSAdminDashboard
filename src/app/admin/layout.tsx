@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { User as UserType } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { NotificationsPopover } from '@/components/notifications-popover';
 
 
@@ -51,15 +51,17 @@ export default function AdminLayout({
   if (userProfile?.role !== 'admin') {
       return (
           <div className="flex h-screen w-screen items-center justify-center bg-background p-4">
-              <Card className="max-w-md w-full">
-                <CardHeader className="text-center">
+              <Card className="max-w-md w-full text-center">
+                <CardHeader>
                     <div className="flex justify-center mb-4">
-                        <AlertTriangle className="w-12 h-12 text-destructive"/>
+                        <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                            <AlertTriangle className="w-8 h-8 text-destructive"/>
+                        </div>
                     </div>
                     <CardTitle className="text-2xl">Access Denied</CardTitle>
+                    <CardDescription>You do not have the required permissions to access this page.</CardDescription>
                 </CardHeader>
-                <CardContent className="text-center">
-                    <p className="text-muted-foreground mb-6">You do not have permission to access the admin panel.</p>
+                <CardContent>
                     <Button onClick={() => router.push('/dashboard')}>Return to Dashboard</Button>
                 </CardContent>
               </Card>

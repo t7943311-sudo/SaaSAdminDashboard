@@ -67,7 +67,7 @@ export default function AdminWorkspaceDetailsPage() {
             <div className="space-y-1">
               <CardTitle className="text-3xl">{workspaceId}</CardTitle>
               <CardDescription className="text-lg text-muted-foreground">
-                {isLoading ? 'Loading members...' : `${members?.length || 0} members`}
+                {isLoading ? <Skeleton className="h-5 w-24" /> : `${members?.length || 0} members`}
               </CardDescription>
             </div>
           </div>
@@ -85,7 +85,15 @@ export default function AdminWorkspaceDetailsPage() {
               <TableBody>
                 {isLoading && (
                     <TableRow>
-                        <TableCell colSpan={4} className="text-center h-24">Loading members...</TableCell>
+                        <TableCell colSpan={4} className="h-24">
+                          <div className="flex items-center gap-3">
+                              <Skeleton className="h-10 w-10 rounded-full" />
+                              <div>
+                                  <Skeleton className="h-4 w-24 mb-1" />
+                                  <Skeleton className="h-3 w-32" />
+                              </div>
+                          </div>
+                        </TableCell>
                     </TableRow>
                 )}
                 {error && (
@@ -128,7 +136,7 @@ export default function AdminWorkspaceDetailsPage() {
                   </TableRow>
                 )) : (
                     <TableRow>
-                        <TableCell colSpan={4} className="text-center h-24">No members found in this workspace.</TableCell>
+                        <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">No members found in this workspace.</TableCell>
                     </TableRow>
                 )}
               </TableBody>

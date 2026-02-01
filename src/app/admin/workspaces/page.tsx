@@ -31,6 +31,7 @@ import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import type { User as FirebaseUserEntity } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Workspace {
   id: string;
@@ -139,7 +140,18 @@ export default function AdminWorkspacesPage() {
               <TableBody>
                 {isLoading && (
                     <TableRow>
-                        <TableCell colSpan={5} className="text-center h-24">Loading workspaces...</TableCell>
+                        <TableCell colSpan={5} className="h-24">
+                           <div className="flex justify-between items-center">
+                                <Skeleton className="h-5 w-32" />
+                                <div className="flex items-center gap-3">
+                                  <Skeleton className="h-8 w-8 rounded-full" />
+                                  <Skeleton className="h-8 w-24" />
+                                </div>
+                                <Skeleton className="h-5 w-20" />
+                                <Skeleton className="h-5 w-24" />
+                                <Skeleton className="h-8 w-8" />
+                           </div>
+                        </TableCell>
                     </TableRow>
                 )}
                 {error && (
@@ -147,6 +159,14 @@ export default function AdminWorkspacesPage() {
                     <TableCell colSpan={5} className="text-center text-destructive h-24">
                       An error occurred while fetching data.
                     </TableCell>
+                  </TableRow>
+                )}
+                {!isLoading && !error && filteredWorkspaces && filteredWorkspaces.length === 0 && (
+                  <TableRow>
+                      <TableCell colSpan={5} className="h-24 text-center">
+                        <h3 className="font-semibold">No workspaces found.</h3>
+                        <p className="text-muted-foreground text-sm">When users sign up, their workspaces will appear here.</p>
+                      </TableCell>
                   </TableRow>
                 )}
                 {!isLoading && !error && filteredWorkspaces && filteredWorkspaces.length > 0 ? filteredWorkspaces.map((ws) => (
@@ -195,11 +215,7 @@ export default function AdminWorkspacesPage() {
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                )) : (
-                    <TableRow>
-                        <TableCell colSpan={5} className="text-center h-24">No workspaces found.</TableCell>
-                    </TableRow>
-                )}
+                )) : null}
               </TableBody>
             </Table>
           </CardContent>

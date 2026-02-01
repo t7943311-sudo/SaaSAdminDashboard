@@ -35,6 +35,7 @@ import { InviteUserDialog } from "@/components/dashboard/users/invite-user-dialo
 import { RemoveUserAlert } from "@/components/dashboard/users/remove-user-alert";
 import { EditRoleDialog } from "@/components/dashboard/users/edit-role-dialog";
 import { AddUserDialog } from "@/components/dashboard/users/add-user-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function exportToCsv(filename: string, rows: object[]) {
     if (!rows || !rows.length) {
@@ -202,15 +203,35 @@ export default function UsersPage() {
               <TableBody>
                 {isLoading && (
                     <TableRow>
-                        <TableCell colSpan={4} className="text-center">Loading users...</TableCell>
+                        <TableCell colSpan={4} className="h-24">
+                            <div className="flex items-center gap-3">
+                                <Skeleton className="h-10 w-10 rounded-full" />
+                                <div>
+                                    <Skeleton className="h-4 w-24 mb-1" />
+                                    <Skeleton className="h-3 w-32" />
+                                </div>
+                            </div>
+                        </TableCell>
                     </TableRow>
                 )}
                 {error && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-destructive">
+                    <TableCell colSpan={4} className="text-center text-destructive h-24">
                       You do not have permission to view users. Please contact an administrator.
                     </TableCell>
                   </TableRow>
+                )}
+                {!isLoading && !error && filteredUsers && filteredUsers.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="h-24 text-center">
+                        <h3 className="font-semibold">No users found.</h3>
+                        <p className="text-muted-foreground text-sm">Add your first user or team member to get started.</p>
+                        <Button variant="outline" size="sm" className="mt-4" onClick={() => setIsAddUserDialogOpen(true)}>
+                          <PlusCircle className="mr-2 h-4 w-4" />
+                          Add User
+                        </Button>
+                      </TableCell>
+                    </TableRow>
                 )}
                 {!isLoading && !error && filteredUsers && filteredUsers.map((user) => (
                   <TableRow key={user.id}>

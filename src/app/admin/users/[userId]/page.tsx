@@ -87,13 +87,15 @@ export default function AdminUserDetailsPage() {
         <CardContent className="mt-6">
             {isLoading ? (
                 <div className="grid gap-6 md:grid-cols-2">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-full" />
+                    <DetailItem icon={<UserIcon />} label="First Name" value={<Skeleton className="h-5 w-24" />} />
+                    <DetailItem icon={<UserIcon />} label="Last Name" value={<Skeleton className="h-5 w-24" />} />
+                    <DetailItem icon={<Mail />} label="Email" value={<Skeleton className="h-5 w-40" />} />
+                    <DetailItem icon={<Shield />} label="Role" value={<Skeleton className="h-6 w-16" />} />
+                    <DetailItem icon={<Activity />} label="Status" value={<Skeleton className="h-6 w-20" />} />
+                    <DetailItem icon={<Calendar />} label="Created At" value={<Skeleton className="h-5 w-32" />} />
                 </div>
             ) : error ? (
-                 <p className="text-destructive">Error loading user details.</p>
+                 <p className="text-destructive text-center">Error loading user details.</p>
             ) : user ? (
                  <div className="grid gap-6 md:grid-cols-2">
                     <DetailItem icon={<UserIcon />} label="First Name" value={user.firstName || '-'} />
@@ -109,7 +111,7 @@ export default function AdminUserDetailsPage() {
                     <DetailItem icon={<Calendar />} label="Created At" value={user.createdAt?.toDate().toLocaleDateString() || '-'} />
                 </div>
             ) : (
-                <p>User not found.</p>
+                <p className="text-center text-muted-foreground">User not found.</p>
             )}
         </CardContent>
       </Card>

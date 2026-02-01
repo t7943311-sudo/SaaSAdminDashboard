@@ -69,20 +69,35 @@ export default function AdminSettingsPage() {
     if (isLoading) {
         return (
             <div className="space-y-6">
-                <Skeleton className="h-12 w-1/3" />
+                <div>
+                    <Skeleton className="h-9 w-64" />
+                    <Skeleton className="h-5 w-96 mt-2" />
+                </div>
                 <Card>
                     <CardHeader>
                         <Skeleton className="h-6 w-1/4" />
                         <Skeleton className="h-4 w-1/2" />
                     </CardHeader>
-                    <CardContent className="space-y-6">
-                        <Skeleton className="h-16 w-full" />
-                        <Skeleton className="h-10 w-1/3" />
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="flex justify-between items-center"><Skeleton className="h-10 w-1/3" /><Skeleton className="h-6 w-12" /></div>
+                        <div className="space-y-2"><Skeleton className="h-4 w-32" /><Skeleton className="h-10 w-48" /></div>
                     </CardContent>
-                    <CardFooter>
-                        <Skeleton className="h-10 w-24" />
-                    </CardFooter>
                 </Card>
+                 <Card>
+                    <CardHeader>
+                        <Skeleton className="h-6 w-1/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                    </CardHeader>
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="space-y-2"><Skeleton className="h-4 w-32" /><Skeleton className="h-10 w-full" /></div>
+                         <Separator />
+                        <div className="flex justify-between items-center"><Skeleton className="h-10 w-1/3" /><Skeleton className="h-6 w-12" /></div>
+                        <div className="flex justify-between items-center"><Skeleton className="h-10 w-1/3" /><Skeleton className="h-6 w-12" /></div>
+                    </CardContent>
+                </Card>
+                 <div className="flex justify-end">
+                    <Skeleton className="h-10 w-32" />
+                </div>
             </div>
         )
     }
@@ -93,6 +108,8 @@ export default function AdminSettingsPage() {
                 <h1 className="text-2xl md:text-3xl font-bold">Admin Settings</h1>
                 <p className="text-muted-foreground">Configure platform-level settings and security policies.</p>
             </div>
+            
+            {error && <Card className="border-destructive"><CardHeader><CardTitle className="text-destructive">Error</CardTitle><CardDescription className="text-destructive">Could not load platform settings. You may not have permission.</CardDescription></CardHeader></Card>}
 
             <Card>
                 <CardHeader>
@@ -159,5 +176,3 @@ export default function AdminSettingsPage() {
         </div>
     )
 }
-
-    

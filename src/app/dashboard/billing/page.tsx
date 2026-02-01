@@ -103,7 +103,7 @@ export default function BillingPage() {
     if (!user) return null;
     return query(collection(firestore, `users/${user.uid}/subscriptions`), where("status", "in", ["active", "trialing", "past_due"]));
   }, [firestore, user]);
-  const { data: subscriptions, isLoading: isLoadingSubscription } = useCollection<Subscription>(subscriptionQuery);
+  const { data: subscriptions, isLoading: isLoadingSubscription, error: subscriptionError } = useCollection<Subscription>(subscriptionQuery);
   let activeSubscription = subscriptions?.[0];
 
   // Fetch user's invoices
@@ -111,10 +111,10 @@ export default function BillingPage() {
       if (!user) return null;
       return query(collection(firestore, `users/${user.uid}/invoices`));
   }, [firestore, user]);
-  const { data: invoicesFromDb, isLoading: isLoadingInvoices } = useCollection<Invoice>(invoicesQuery);
+  const { data: invoicesFromDb, isLoading: isLoadingInvoices, error: invoicesError } = useCollection<Invoice>(invoicesQuery);
   let invoices = invoicesFromDb;
 
-  const isDemoMode = !isLoadingSubscription && !activeSubscription && user;
+  const isDemoMode = !isLoadingSubscription && !activeSubscription && user && !subscriptionError;
 
   if (isDemoMode) {
     activeSubscription = {
@@ -249,6 +249,8 @@ export default function BillingPage() {
           <h1 className="text-2xl md:text-3xl font-bold">Billing &amp; Subscription</h1>
           <p className="text-muted-foreground">Manage your plan, usage, and payment history.</p>
         </div>
+        
+        {subscriptionError && <Card className="border-destructive"><CardHeader><CardTitle className="text-destructive">Error</CardTitle><CardDescription className="text-destructive">Could not load subscription details. You may not have permission.</CardDescription></CardHeader></Card>}
 
         <Card>
           <CardHeader>
@@ -312,9 +314,9 @@ export default function BillingPage() {
 
         {isLoadingPlans && !isDemoMode ? (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                <Skeleton className="h-96 w-full" />
-                <Skeleton className="h-96 w-full" />
-                <Skeleton className="h-96 w-full" />
+                <Card className="space-y-4 p-6"><Skeleton className="h-6 w-1/3" /><Skeleton className="h-10 w-1/2" /><Skeleton className="h-4 w-3/4" /><div className="space-y-2 pt-4"><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-2/3" /></div><div className="pt-4"><Skeleton className="h-12 w-full" /></div></Card>
+                <Card className="space-y-4 p-6"><Skeleton className="h-6 w-1/3" /><Skeleton className="h-10 w-1/2" /><Skeleton className="h-4 w-3/4" /><div className="space-y-2 pt-4"><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-2/3" /></div><div className="pt-4"><Skeleton className="h-12 w-full" /></div></Card>
+                <Card className="space-y-4 p-6"><Skeleton className="h-6 w-1/3" /><Skeleton className="h-10 w-1/2" /><Skeleton className="h-4 w-3/4" /><div className="space-y-2 pt-4"><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-2/3" /></div><div className="pt-4"><Skeleton className="h-12 w-full" /></div></Card>
             </div>
         ) : (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -403,6 +405,10 @@ export default function BillingPage() {
                             <div className="flex justify-center"><Loader2 className="animate-spin" /></div>
                         </TableCell>
                     </TableRow>
+                ) : invoicesError ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center h-24 text-destructive">Could not load invoices.</TableCell>
+                  </TableRow>
                 ) : invoices && invoices.length > 0 ? (
                   invoices.map((invoice) => (
                     <TableRow key={invoice.id}>
@@ -427,7 +433,7 @@ export default function BillingPage() {
                   ))
                 ) : (
                     <TableRow>
-                        <TableCell colSpan={5} className="text-center h-24">No invoices found.</TableCell>
+                        <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">No invoices found.</TableCell>
                     </TableRow>
                 )}
               </TableBody>

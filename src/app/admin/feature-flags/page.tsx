@@ -110,6 +110,18 @@ export default function AdminFeatureFlagsPage() {
                             <TableBody>
                                 {isLoading && <TableRow><TableCell colSpan={5} className="text-center h-24"><Loader2 className="mx-auto h-6 w-6 animate-spin" /></TableCell></TableRow>}
                                 {error && <TableRow><TableCell colSpan={5} className="text-center h-24 text-destructive">Error loading feature flags.</TableCell></TableRow>}
+                                {!isLoading && !error && filteredFlags.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="h-24 text-center">
+                                            <h3 className="font-semibold">No feature flags created yet.</h3>
+                                            <p className="text-muted-foreground text-sm">Create your first flag to get started.</p>
+                                            <Button variant="outline" size="sm" className="mt-4" onClick={() => setIsCreateDialogOpen(true)}>
+                                                <PlusCircle className="mr-2 h-4 w-4" />
+                                                Create Flag
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
                                 {!isLoading && filteredFlags?.map((flag) => (
                                     <TableRow key={flag.id}>
                                         <TableCell className="font-medium">{flag.name}</TableCell>
@@ -153,5 +165,3 @@ export default function AdminFeatureFlagsPage() {
         </>
     )
 }
-
-    
