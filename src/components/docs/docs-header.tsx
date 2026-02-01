@@ -24,7 +24,7 @@ export function DocsHeader({ sectionTitle = "Docs" }: { sectionTitle?: string })
           </Link>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+        <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center gap-6 text-sm font-medium">
              <Link href="/docs" className="text-muted-foreground hover:text-foreground">
                 Docs
              </Link>
@@ -54,7 +54,7 @@ export function DocsHeader({ sectionTitle = "Docs" }: { sectionTitle?: string })
             </Button>
           ) : (
             <Button asChild>
-              <Link href="/register">Sign Up</Button>
+              <Link href="/register">Sign Up</Link>
             </Button>
           )}
         </div>
