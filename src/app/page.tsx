@@ -23,6 +23,7 @@ import { Logo } from "@/components/logo";
 import { placeholderImages } from "@/lib/placeholder-images";
 import { useUser } from "@/firebase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const coreFeatures = [
   {
@@ -147,32 +148,33 @@ export default function LandingPage() {
         <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(hsl(var(--muted))_1px,transparent_1px)] [background-size:32px_32px]"></div>
 
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center">
-            <div className="mr-auto flex items-center gap-2">
-              <Logo className="w-7 h-7" />
-              <h1 className="text-xl font-bold">LaunchBase</h1>
-            </div>
-          <nav className="hidden md:flex items-center gap-4">
-            <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground">Features</Link>
-            <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground">Docs</Link>
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Logo className="w-7 h-7" />
+            <h1 className="text-xl font-bold">LaunchBase</h1>
+          </div>
+          <nav className="hidden md:flex items-center gap-6 text-sm">
+            <Link href="#features" className="font-medium text-muted-foreground hover:text-foreground">Features</Link>
+            <Link href="#pricing" className="font-medium text-muted-foreground hover:text-foreground">Pricing</Link>
+            <Link href="/docs" className="font-medium text-muted-foreground hover:text-foreground">Docs</Link>
           </nav>
-          <div className="flex flex-1 items-center justify-end space-x-2">
+          <div className="flex items-center justify-end gap-2">
               {isUserLoading ? (
-                <div className="h-10 w-48 flex gap-2">
-                  <div className="h-full w-1/2 animate-pulse rounded-md bg-muted"></div>
-                  <div className="h-full w-1/2 animate-pulse rounded-md bg-muted"></div>
+                <div className="h-10 w-32 flex gap-2">
+                  <Skeleton className="h-full w-1/2" />
+                  <Skeleton className="h-full w-1/2" />
                 </div>
               ) : user ? (
-                <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg" asChild>
-                  <Link href="/dashboard">Go to Dashboard</Link>
+                <Button asChild>
+                  <Link href="/dashboard">Dashboard</Link>
                 </Button>
               ) : (
                 <>
                   <Button variant="ghost" asChild>
                     <Link href="/login">Log In</Link>
                   </Button>
-                  <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg" asChild>
-                    <Link href="/register">Get Started</Link>
+                  <Button asChild>
+                    <Link href="/register">Sign Up</Link>
                   </Button>
                 </>
               )}
@@ -193,7 +195,7 @@ export default function LandingPage() {
                 LaunchBase is a production-ready Next.js starter kit with everything you need to build, ship, and scale your SaaS application, fast.
                 </p>
                 <div className="flex justify-center lg:justify-start gap-4">
-                    <Button size="lg" className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg" asChild>
+                    <Button size="lg" asChild>
                     <Link href="/register">Get the Starter Kit <ArrowRight className="w-4 h-4 ml-2"/></Link>
                     </Button>
                     <Button size="lg" variant="outline" asChild>
@@ -373,7 +375,7 @@ export default function LandingPage() {
         </section>
 
         {/* Pricing */}
-        <section className="py-24">
+        <section id="pricing" className="py-24">
             <div className="container">
                  <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold tracking-tight">One Price, Unlimited Potential</h2>
