@@ -1,0 +1,30 @@
+import { DocsHeader } from '@/components/docs/docs-header';
+import { DocsNav } from '@/components/docs/docs-nav';
+import { PageTOC } from '@/components/docs/page-toc';
+
+export default function DocsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-h-screen flex-col">
+      <DocsHeader />
+      <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
+        <aside className="fixed top-16 z-30 -ml-2 hidden h-[calc(100vh-4rem)] w-full shrink-0 md:sticky md:block">
+          <div className="relative h-full overflow-y-auto py-6 pr-6 lg:py-8">
+            <DocsNav />
+          </div>
+        </aside>
+        <div className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_220px]">
+          <main className="w-full">
+            <div className="prose prose-sm md:prose-base prose-invert max-w-none prose-headings:scroll-mt-20 prose-headings:font-semibold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-pre:bg-secondary/50 prose-code:bg-secondary/50 prose-code:p-1 prose-code:rounded">
+              {children}
+            </div>
+          </main>
+          <PageTOC />
+        </div>
+      </div>
+    </div>
+  );
+}

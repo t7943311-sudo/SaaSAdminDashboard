@@ -148,12 +148,15 @@ export default function LandingPage() {
 
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center">
-            <div className="mr-4 flex items-center gap-2">
+            <div className="mr-auto flex items-center gap-2">
               <Logo className="w-7 h-7" />
               <h1 className="text-xl font-bold">LaunchBase</h1>
             </div>
+          <nav className="hidden md:flex items-center gap-4">
+            <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground">Features</Link>
+            <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground">Docs</Link>
+          </nav>
           <div className="flex flex-1 items-center justify-end space-x-2">
-            <nav className="flex items-center gap-4">
               {isUserLoading ? (
                 <div className="h-10 w-48 flex gap-2">
                   <div className="h-full w-1/2 animate-pulse rounded-md bg-muted"></div>
@@ -173,7 +176,6 @@ export default function LandingPage() {
                   </Button>
                 </>
               )}
-            </nav>
           </div>
         </div>
       </header>
@@ -195,7 +197,7 @@ export default function LandingPage() {
                     <Link href="/register">Get the Starter Kit <ArrowRight className="w-4 h-4 ml-2"/></Link>
                     </Button>
                     <Button size="lg" variant="outline" asChild>
-                        <Link href="#features">View Demo</Link>
+                        <Link href="/dashboard">View Demo</Link>
                     </Button>
                 </div>
                  <p className="text-xs text-muted-foreground mt-4">Built for modern SaaS teams.</p>
@@ -451,7 +453,7 @@ export default function LandingPage() {
             <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} LaunchBase. All rights reserved.</p>
           </div>
           <div className="flex gap-6">
-            <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+            <Link href="/docs" className="text-sm text-muted-foreground hover:text-foreground">
               Docs
             </Link>
              <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
