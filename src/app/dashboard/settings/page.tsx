@@ -27,6 +27,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 
 const teamMembers = [
     { name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin', avatar: 'https://picsum.photos/seed/1/40/40'},
@@ -34,168 +35,272 @@ const teamMembers = [
     { name: 'Charlie Brown', email: 'charlie@example.com', role: 'Member', avatar: 'https://picsum.photos/seed/3/40/40'},
 ];
 
+const apiKeys = [
+    { name: 'Primary Key', key: 'pk_live_****************', created: 'Jan 1, 2024' },
+    { name: 'Test Key', key: 'sk_test_****************', created: 'Dec 15, 2023' },
+];
+
+
 export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage your account, team, and application settings.</p>
+        <p className="text-muted-foreground">Manage your account, workspace, and application settings.</p>
       </div>
-      <Tabs defaultValue="profile">
-        <TabsList>
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="organization">Organization</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
+      <Tabs defaultValue="profile" orientation="vertical" className="flex flex-col md:flex-row gap-8">
+        <TabsList className="flex md:flex-col items-start justify-start h-auto bg-transparent p-0 border-b md:border-r md:border-b-0 w-full md:w-1/5 shrink-0">
+          <TabsTrigger value="profile" className="w-full justify-start data-[state=active]:bg-muted">Profile</TabsTrigger>
+          <TabsTrigger value="account" className="w-full justify-start data-[state=active]:bg-muted">Account & Workspace</TabsTrigger>
+          <TabsTrigger value="security" className="w-full justify-start data-[state=active]:bg-muted">Security</TabsTrigger>
+          <TabsTrigger value="notifications" className="w-full justify-start data-[state=active]:bg-muted">Notifications</TabsTrigger>
+          <TabsTrigger value="api-keys" className="w-full justify-start data-[state=active]:bg-muted">API Keys</TabsTrigger>
+          <TabsTrigger value="appearance" className="w-full justify-start data-[state=active]:bg-muted">Appearance</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="profile" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile</CardTitle>
-              <CardDescription>
-                This is how others will see you on the site.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20">
-                    <AvatarImage src="https://picsum.photos/seed/avatar/80/80" />
-                    <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
+        <div className="w-full">
+            <TabsContent value="profile" className="mt-0">
+            <Card>
+                <CardHeader>
+                <CardTitle>Profile</CardTitle>
+                <CardDescription>
+                    This is how others will see you on the site.
+                </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                <div className="flex items-center gap-4">
+                    <Avatar className="h-20 w-20">
+                        <AvatarImage src="https://picsum.photos/seed/avatar/80/80" />
+                        <AvatarFallback>AD</AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-2">
+                        <Label htmlFor="avatar-upload" className="cursor-pointer">
+                            <Button asChild><span>Upload Avatar</span></Button>
+                        </Label>
+                        <Input id="avatar-upload" type="file" className="hidden" />
+                        <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
+                    </div>
+                </div>
                 <div className="space-y-2">
-                    <Label htmlFor="avatar-upload" className="cursor-pointer">
-                        <Button asChild><span >Upload Avatar</span></Button>
-                    </Label>
-                    <Input id="avatar-upload" type="file" className="hidden" />
-                    <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" defaultValue="Adam Smith" />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" defaultValue="Adam Smith" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue="m@example.com" disabled />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Save Changes</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="security" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Security</CardTitle>
-              <CardDescription>
-                Manage your password and two-factor authentication.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="current-password">Current Password</Label>
-                <Input id="current-password" type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <Input id="new-password" type="password" />
-              </div>
-               <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <h3 className="font-medium">Two-Factor Authentication (2FA)</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Add an extra layer of security to your account.
-                  </p>
+                <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" defaultValue="m@example.com" disabled />
+                    <p className="text-xs text-muted-foreground">You can't change your email address.</p>
                 </div>
-                <Switch id="2fa-toggle" />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Update Password</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
+                </CardContent>
+                <CardFooter>
+                <Button>Save Changes</Button>
+                </CardFooter>
+            </Card>
+            </TabsContent>
 
-        <TabsContent value="organization" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Team Members</CardTitle>
-              <CardDescription>
-                Manage your team members and their roles.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Member</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {teamMembers.map((member) => (
-                    <TableRow key={member.email}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                            <Avatar>
-                                <AvatarImage src={member.avatar} />
-                                <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <div className="font-medium">{member.name}</div>
-                                <div className="text-sm text-muted-foreground">{member.email}</div>
-                            </div>
+            <TabsContent value="account" className="mt-0 space-y-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Workspace Settings</CardTitle>
+                        <CardDescription>Manage your workspace details.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-2">
+                            <Label htmlFor="workspace-name">Workspace Name</Label>
+                            <Input id="workspace-name" defaultValue="Acme Inc." />
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Select defaultValue={member.role}>
-                          <SelectTrigger className="w-[120px]">
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Admin">Admin</SelectItem>
-                            <SelectItem value="Member">Member</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">Remove</Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-            <CardFooter className="justify-between">
-                <p className="text-sm text-muted-foreground">You have {teamMembers.length} team members.</p>
-                <Button>Invite Member</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
+                    </CardContent>
+                    <CardFooter>
+                        <Button>Save Workspace</Button>
+                    </CardFooter>
+                </Card>
+                <Card>
+                    <CardHeader>
+                    <CardTitle>Team Members</CardTitle>
+                    <CardDescription>
+                        Manage your team members and their roles.
+                    </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                    <Table>
+                        <TableHeader>
+                        <TableRow>
+                            <TableHead>Member</TableHead>
+                            <TableHead>Role</TableHead>
+                            <TableHead className="text-right">Action</TableHead>
+                        </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                        {teamMembers.map((member) => (
+                            <TableRow key={member.email}>
+                            <TableCell>
+                                <div className="flex items-center gap-3">
+                                    <Avatar>
+                                        <AvatarImage src={member.avatar} />
+                                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <div className="font-medium">{member.name}</div>
+                                        <div className="text-sm text-muted-foreground">{member.email}</div>
+                                    </div>
+                                </div>
+                            </TableCell>
+                            <TableCell>
+                                <Select defaultValue={member.role}>
+                                <SelectTrigger className="w-[120px]">
+                                    <SelectValue placeholder="Select role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Admin">Admin</SelectItem>
+                                    <SelectItem value="Member">Member</SelectItem>
+                                </SelectContent>
+                                </Select>
+                            </TableCell>
+                            <TableCell className="text-right">
+                                <Button variant="ghost" size="sm">Remove</Button>
+                            </TableCell>
+                            </TableRow>
+                        ))}
+                        </TableBody>
+                    </Table>
+                    </CardContent>
+                    <CardFooter className="justify-between">
+                        <p className="text-sm text-muted-foreground">You have {teamMembers.length} team members.</p>
+                        <Button>Invite Member</Button>
+                    </CardFooter>
+                </Card>
+                <Card className="border-destructive/50">
+                    <CardHeader>
+                        <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                        <CardDescription>These actions are irreversible. Please proceed with caution.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between rounded-lg border border-border p-4">
+                            <div>
+                                <h3 className="font-medium">Delete Workspace</h3>
+                                <p className="text-sm text-muted-foreground">Permanently delete your workspace and all its data.</p>
+                            </div>
+                            <Button variant="destructive">Delete</Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </TabsContent>
 
-        <TabsContent value="appearance" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-              <CardDescription>
-                Customize the look and feel of your dashboard.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Theme</Label>
-                <p className="text-sm text-muted-foreground">
-                    Light mode support is coming soon!
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            <TabsContent value="security" className="mt-0">
+            <Card>
+                <CardHeader>
+                <CardTitle>Security</CardTitle>
+                <CardDescription>
+                    Manage your password and two-factor authentication.
+                </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="current-password">Current Password</Label>
+                    <Input id="current-password" type="password" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="new-password">New Password</Label>
+                    <Input id="new-password" type="password" />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div>
+                    <h3 className="font-medium">Two-Factor Authentication (2FA)</h3>
+                    <p className="text-sm text-muted-foreground">
+                        Add an extra layer of security to your account.
+                    </p>
+                    </div>
+                    <Switch id="2fa-toggle" />
+                </div>
+                </CardContent>
+                <CardFooter>
+                <Button>Update Password</Button>
+                </CardFooter>
+            </Card>
+            </TabsContent>
 
+             <TabsContent value="notifications" className="mt-0">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Notifications</CardTitle>
+                        <CardDescription>Manage how you receive notifications.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div>
+                                <h3 className="font-medium">Email Notifications</h3>
+                                <p className="text-sm text-muted-foreground">Receive emails about your account, new features, and updates.</p>
+                            </div>
+                            <Switch id="email-notifications-toggle" defaultChecked/>
+                        </div>
+                         <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div>
+                                <h3 className="font-medium">In-app Notifications</h3>
+                                <p className="text-sm text-muted-foreground">Get notified about activity within the application.</p>
+                            </div>
+                            <Switch id="in-app-notifications-toggle" defaultChecked />
+                        </div>
+                    </CardContent>
+                    <CardFooter>
+                        <Button>Save Preferences</Button>
+                    </CardFooter>
+                </Card>
+            </TabsContent>
+
+            <TabsContent value="api-keys" className="mt-0">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>API Keys</CardTitle>
+                        <CardDescription>Manage your API keys for programmatic access.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Key Name</TableHead>
+                                    <TableHead>Key</TableHead>
+                                    <TableHead>Created</TableHead>
+                                    <TableHead className="text-right">Action</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {apiKeys.map((apiKey) => (
+                                <TableRow key={apiKey.key}>
+                                    <TableCell className="font-medium">{apiKey.name}</TableCell>
+                                    <TableCell><code>{apiKey.key}</code></TableCell>
+                                    <TableCell>{apiKey.created}</TableCell>
+                                    <TableCell className="text-right">
+                                        <Button variant="ghost" size="sm">Revoke</Button>
+                                    </TableCell>
+                                </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                    <CardFooter>
+                        <Button>Generate new key</Button>
+                    </CardFooter>
+                </Card>
+            </TabsContent>
+
+            <TabsContent value="appearance" className="mt-0">
+            <Card>
+                <CardHeader>
+                <CardTitle>Appearance</CardTitle>
+                <CardDescription>
+                    Customize the look and feel of your dashboard.
+                </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label>Theme</Label>
+                    <p className="text-sm text-muted-foreground">
+                        Light mode support is coming soon!
+                    </p>
+                </div>
+                </CardContent>
+            </Card>
+            </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
