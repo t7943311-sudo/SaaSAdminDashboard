@@ -6,13 +6,14 @@ import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from "@/compon
 import { AdminNav } from "@/components/admin-nav";
 import { UserNav } from "@/components/user-nav";
 import { Logo } from "@/components/logo";
-import { Bell, Search, AlertTriangle } from "lucide-react";
+import { Search, AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { User as UserType } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { NotificationsPopover } from '@/components/notifications-popover';
 
 
 export default function AdminLayout({
@@ -90,10 +91,7 @@ export default function AdminLayout({
               />
             </div>
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Bell className="h-4 w-4" />
-                <span className="sr-only">Toggle notifications</span>
-              </Button>
+              <NotificationsPopover />
               <UserNav />
             </div>
           </header>

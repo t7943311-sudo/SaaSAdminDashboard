@@ -6,12 +6,13 @@ import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from "@/compon
 import { DashboardNav } from "@/components/dashboard-nav";
 import { UserNav } from "@/components/user-nav";
 import { Logo } from "@/components/logo";
-import { Bell, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { User as UserType } from '@/lib/types';
+import { NotificationsPopover } from '@/components/notifications-popover';
 
 
 export default function DashboardLayout({
@@ -73,10 +74,7 @@ export default function DashboardLayout({
               />
             </div>
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Bell className="h-4 w-4" />
-                <span className="sr-only">Toggle notifications</span>
-              </Button>
+              <NotificationsPopover />
               <UserNav />
             </div>
           </header>
