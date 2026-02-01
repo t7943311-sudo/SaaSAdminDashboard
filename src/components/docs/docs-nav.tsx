@@ -30,7 +30,7 @@ const navItems = [
             href: '/docs',
         },
         {
-            label: 'Quickstart',
+            label: 'Installation & Setup',
             icon: <Rocket className="h-4 w-4" />,
             href: '/docs/getting-started',
         },

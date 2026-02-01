@@ -40,13 +40,13 @@ export default function AuthenticationPage() {
       </p>
       <CodeBlock code={firebaseConfig} lang="json" />
 
-      <h2 id="accessing-the-user">Accessing the User State</h2>
+      <h2 id="frontend-accessing-the-user">Frontend: Accessing the User State</h2>
       <p>
         On the client-side, you can easily access the currently authenticated user's state using the <code>useUser</code> hook. This hook provides the user object, loading state, and any authentication errors, abstracting away the complexity of Firebase's `onAuthStateChanged` listener.
       </p>
       <CodeBlock code={useUserHook} lang="tsx" />
       <Callout variant="info">
-        The <code>useUser</code> hook should be used within a component that is a child of the <code>FirebaseClientProvider</code>, which is already set up in your root layout (<code>src/app/layout.tsx</code>).
+        The <code>useUser</code> hook should be used within a component that is a child of the <code>FirebaseProvider</code>, which is already set up in your root layout (<code>src/app/layout.tsx</code>).
       </Callout>
 
       <h2 id="securing-pages">Securing Pages & Routes</h2>
@@ -57,18 +57,31 @@ export default function AuthenticationPage() {
         This client-side protection is handled in the respective layout files (e.g., <code>src/app/dashboard/layout.tsx</code>) by checking the state from the <code>useUser</code> hook.
       </p>
 
-      <h2 id="security-rules">Backend Security (Firestore Rules)</h2>
+      <h2 id="backend-security-rules">Backend: Firestore Security Rules</h2>
       <p>
         While client-side checks are useful for UX, true security is enforced on the backend by Firestore Security Rules. The default rules in <code>firestore.rules</code> enforce a user-ownership model, where users can only read and write their own data.
       </p>
+      <p>
+        The link between the frontend and backend is the user's unique ID (UID). When a user is authenticated, the <code>useUser()</code> hook provides their <code>user.uid</code>. This UID is what you use in security rules to verify ownership.
+      </p>
       <CodeBlock code={`
-// Example rule: Only the owner can read or write their own templates.
-match /users/{userId}/templates/{templateId} {
-  allow read, write: if isOwner(userId);
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if the user is the owner of a document
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Example rule: Only the owner can read or write their own templates.
+    match /users/{userId}/templates/{templateId} {
+      allow read, write: if isOwner(userId);
+    }
+  }
 }
       `} lang="rust" />
       <p>
-        This ensures that even if a user bypasses client-side restrictions, they cannot access or modify data that doesn't belong to them. See the <Link href="/docs/core-concepts">Core Concepts</Link> guide for more on the data model.
+        This ensures that even if a user bypasses client-side restrictions, they cannot access or modify data that doesn't belong to them because the UID in their authentication token (<code>request.auth.uid</code>) won't match the <code>userId</code> in the document path.
       </p>
        <Callout variant="warning">
         Always test your security rules thoroughly before deploying to production. The Firebase Emulator Suite is highly recommended for local testing.

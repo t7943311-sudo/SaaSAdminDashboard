@@ -55,7 +55,7 @@ match /auditLogs/{logId} {
 }
        `} lang="rust" />
       
-      <h2 id="data-model">Data Model (Firestore)</h2>
+      <h2 id="data-model">Data Model & Firestore Backend</h2>
       <p>
         The starter kit uses Firebase Firestore as its database. The data is structured to be secure and scalable, following a "user-owned data" pattern. The main collections are:
       </p>
@@ -76,7 +76,17 @@ match /auditLogs/{logId} {
        <p>
         This structure is defined in <code>docs/backend.json</code>. The security rules in <code>firestore.rules</code> enforce access control based on this structure.
       </p>
-
+      
+      <h3 id="frontend-interaction">Frontend Interaction with the Database</h3>
+       <p>
+        The frontend application interacts with Firestore primarily through two custom hooks provided in <code>/src/firebase/</code>:
+       </p>
+       <ul>
+          <li><strong><code>useDoc</code></strong>: Subscribes to a single document in real-time.</li>
+          <li><strong><code>useCollection</code></strong>: Subscribes to a collection or a query in real-time.</li>
+       </ul>
+       <p>These hooks handle loading states, errors, and permissions automatically, making it simple to fetch and display data securely in your components.</p>
+       
       <Callout variant="info">
         The data model uses denormalization for security and performance. For example, the <code>userId</code> is often stored on subcollection documents to avoid extra database reads in security rules, which is a critical best practice for Firestore.
       </Callout>
