@@ -67,7 +67,7 @@ export default function ApiReferencePage() {
       <p>The Users API allows you to create, retrieve, and manage users in your application.</p>
       
       {usersEndpoints.map(endpoint => (
-        <EndpointCard key={endpoint.path} {...endpoint} />
+        <EndpointCard key={`${endpoint.method}-${endpoint.path}`} {...endpoint} />
       ))}
       
     </>
