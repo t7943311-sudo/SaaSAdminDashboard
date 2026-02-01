@@ -55,15 +55,15 @@ import { placeholderImages } from '@/lib/placeholder-images';
 import { Badge } from '@/components/ui/badge';
 
 const teamMembers = [
-    { id: 'team-member-1', name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin' },
-    { id: 'team-member-2', name: 'Bob Williams', email: 'bob@example.com', role: 'Member' },
-    { id: 'team-member-3', name: 'Charlie Brown', email: 'charlie@example.com', role: 'Member' },
+    { id: 'testimonial-1', name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin' },
+    { id: 'testimonial-2', name: 'Bob Williams', email: 'bob@example.com', role: 'Member' },
+    { id: 'testimonial-3', name: 'Charlie Brown', email: 'charlie@example.com', role: 'Member' },
 ];
 
 const apiKeys = [
-    { id: 'key_1', name: 'Primary Live Key', key: 'pk_live_******************', created: 'Jan 1, 2024', lastUsed: '5m ago', scope: 'Full Access', status: 'Active' },
-    { id: 'key_2', name: 'Read-only Analytics Key', key: 'pk_live_******************', created: 'Feb 15, 2024', lastUsed: '2 days ago', scope: 'Read-only', status: 'Active' },
-    { id: 'key_3', name: 'Old Test Key', key: 'sk_test_******************', created: 'Dec 1, 2023', lastUsed: '3 months ago', scope: 'Test Data', status: 'Revoked' },
+    { id: 'key_1', name: 'Primary Live Key', key: 'pk_live_******************1', created: 'Jan 1, 2024', lastUsed: '5m ago', scope: 'Full Access', status: 'Active' },
+    { id: 'key_2', name: 'Read-only Analytics Key', key: 'pk_live_******************2', created: 'Feb 15, 2024', lastUsed: '2 days ago', scope: 'Read-only', status: 'Active' },
+    { id: 'key_3', name: 'Old Test Key', key: 'sk_test_******************3', created: 'Dec 1, 2023', lastUsed: '3 months ago', scope: 'Test Data', status: 'Revoked' },
 ];
 
 const webhooks = [

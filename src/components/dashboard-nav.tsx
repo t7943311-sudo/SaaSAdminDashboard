@@ -14,6 +14,7 @@ import {
   LayoutGrid,
   Settings,
   Users,
+  Palette,
 } from "lucide-react";
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
   { href: "/dashboard/users", icon: <Users />, label: "Users & Teams" },
   { href: "/dashboard/billing", icon: <CreditCard />, label: "Billing" },
   { href: "/dashboard/settings", icon: <Settings />, label: "Settings" },
+  { href: "/dashboard/theme", icon: <Palette />, label: "Theme Builder" },
 ];
 
 export function DashboardNav() {
