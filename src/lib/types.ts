@@ -64,4 +64,17 @@ export type PlatformSettings = {
     failedPaymentAlerts: boolean;
 };
 
+export type AuditLog = {
+    id: string;
+    actor: {
+        id: string;
+        email: string;
+        name: string;
+        avatar?: string;
+    };
+    action: string;
+    details: string;
+    ipAddress: string;
+    createdAt: Timestamp;
+}
     

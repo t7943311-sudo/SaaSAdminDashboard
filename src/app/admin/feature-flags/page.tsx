@@ -20,15 +20,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useUser, useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import type { FeatureFlag } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { CreateFlagDialog } from '@/components/admin/feature-flags/create-flag-dialog';
+import { logAudit } from '@/lib/audit-logger';
 
 export default function AdminFeatureFlagsPage() {
     const firestore = useFirestore();
+    const { user: adminUser } = useUser();
     const flagsCollection = useMemoFirebase(() => collection(firestore, 'featureFlags'), [firestore]);
     const { data: flags, isLoading, error } = useCollection<FeatureFlag>(flagsCollection);
     const { toast } = useToast();
@@ -41,12 +43,16 @@ export default function AdminFeatureFlagsPage() {
         return flags.filter(flag => flag.name.toLowerCase().includes(searchTerm.toLowerCase()));
     }, [flags, searchTerm]);
 
-    const handleToggleFlag = async (id: string, currentStatus: boolean) => {
+    const handleToggleFlag = async (flag: FeatureFlag, currentStatus: boolean) => {
         try {
-            const flagDocRef = doc(firestore, 'featureFlags', id);
+            const flagDocRef = doc(firestore, 'featureFlags', flag.id);
             await updateDoc(flagDocRef, { 
                 status: !currentStatus,
                 modified: serverTimestamp()
+            });
+            logAudit(firestore, adminUser, {
+                action: 'flag.toggled',
+                details: `Toggled flag "${flag.name}" to ${!currentStatus ? 'Enabled' : 'Disabled'}.`
             });
             toast({
                 title: 'Flag Updated',
@@ -57,9 +63,13 @@ export default function AdminFeatureFlagsPage() {
         }
     };
     
-    const handleDeleteFlag = async (id: string) => {
+    const handleDeleteFlag = async (flag: FeatureFlag) => {
         try {
-            await deleteDoc(doc(firestore, 'featureFlags', id));
+            await deleteDoc(doc(firestore, 'featureFlags', flag.id));
+            logAudit(firestore, adminUser, {
+                action: 'flag.deleted',
+                details: `Deleted flag "${flag.name}" (ID: ${flag.id}).`
+            });
             toast({ title: 'Flag Archived', description: 'The feature flag has been removed.' });
         } catch (e) {
             toast({ variant: 'destructive', title: 'Error', description: 'Could not remove the flag.' });
@@ -129,7 +139,7 @@ export default function AdminFeatureFlagsPage() {
                                             <div className="flex items-center gap-2">
                                                 <Switch
                                                     checked={flag.status}
-                                                    onCheckedChange={() => handleToggleFlag(flag.id, flag.status)}
+                                                    onCheckedChange={() => handleToggleFlag(flag, flag.status)}
                                                     aria-label={`Toggle ${flag.name}`}
                                                 />
                                                 <Badge variant={flag.status ? 'secondary' : 'outline'}>
@@ -151,7 +161,7 @@ export default function AdminFeatureFlagsPage() {
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem>Edit Targeting</DropdownMenuItem>
                                                     <DropdownMenuItem>View History</DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteFlag(flag.id)}>Archive Flag</DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteFlag(flag)}>Archive Flag</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>

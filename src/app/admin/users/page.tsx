@@ -27,7 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { useUser, useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection, doc, deleteDoc } from "firebase/firestore";
 import type { User as FirebaseUserEntity } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -35,6 +35,7 @@ import { RemoveUserAlert } from "@/components/dashboard/users/remove-user-alert"
 import { EditRoleDialog } from "@/components/dashboard/users/edit-role-dialog";
 import { AddUserDialog } from "@/components/dashboard/users/add-user-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { logAudit } from "@/lib/audit-logger";
 
 function exportToCsv(filename: string, rows: object[]) {
     if (!rows || !rows.length) {
@@ -77,6 +78,7 @@ export default function AdminUsersPage() {
     const firestore = useFirestore();
     const router = useRouter();
     const { toast } = useToast();
+    const { user: adminUser } = useUser();
     const usersCollection = useMemoFirebase(() => collection(firestore, 'users'), [firestore]);
     const { data: users, isLoading, error } = useCollection<FirebaseUserEntity>(usersCollection);
 
@@ -102,6 +104,10 @@ export default function AdminUsersPage() {
         setIsRemoving(true);
         try {
             await deleteDoc(doc(firestore, "users", userToRemove.id));
+            logAudit(firestore, adminUser, {
+              action: 'user.deleted',
+              details: `Admin ${adminUser?.email} removed user ${userToRemove.email} (ID: ${userToRemove.id})`
+            });
             toast({ title: "Success", description: "User removed successfully." });
             setUserToRemove(null);
         } catch (error: any) {

@@ -189,5 +189,15 @@ service cloud.firestore {
     match /platform/{docId} {
       allow read, write: if isAdmin();
     }
+
+    /**
+     * @description   Stores audit logs of important actions. Only readable and writable by admins.
+     * @path          /auditLogs/{logId}
+     * @allow         Admins can read and write audit logs.
+     * @principle     Secures sensitive audit trail data.
+     */
+    match /auditLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
   }
 }

@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useFirestore } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import type { User as FirebaseUserEntity } from "@/lib/types";
+import { logAudit } from '@/lib/audit-logger';
 
 interface EditRoleDialogProps {
     user: FirebaseUserEntity | null;
@@ -20,6 +21,7 @@ export function EditRoleDialog({ user, isOpen, onOpenChange }: EditRoleDialogPro
     const [role, setRole] = useState<'member' | 'admin' | undefined>(user?.role);
     const [isSaving, setIsSaving] = useState(false);
     const firestore = useFirestore();
+    const { user: adminUser } = useUser();
     const { toast } = useToast();
 
     useEffect(() => {
@@ -33,6 +35,10 @@ export function EditRoleDialog({ user, isOpen, onOpenChange }: EditRoleDialogPro
         try {
             const userDocRef = doc(firestore, 'users', user.id);
             await updateDoc(userDocRef, { role: role });
+            logAudit(firestore, adminUser, {
+                action: 'user.role.updated',
+                details: `Changed role for ${user.email} from ${user.role} to ${role}.`
+            });
             toast({ title: 'Success', description: 'User role updated.' });
             onOpenChange(false);
         } catch (error: any) {

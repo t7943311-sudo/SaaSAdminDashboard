@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFirestore } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { logAudit } from '@/lib/audit-logger';
 
 interface CreateFlagDialogProps {
     isOpen: boolean;
@@ -21,6 +22,7 @@ export function CreateFlagDialog({ isOpen, onOpenChange }: CreateFlagDialogProps
     const [status, setStatus] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     
+    const { user: adminUser } = useUser();
     const firestore = useFirestore();
     const { toast } = useToast();
 
@@ -38,6 +40,11 @@ export function CreateFlagDialog({ isOpen, onOpenChange }: CreateFlagDialogProps
                 status,
                 target: target || 'Not targeted',
                 modified: serverTimestamp()
+            });
+
+            logAudit(firestore, adminUser, {
+                action: 'flag.created',
+                details: `Created feature flag "${name}" with status ${status ? 'Enabled' : 'Disabled'}`
             });
 
             toast({ title: 'Success', description: `Feature flag "${name}" created.` });
@@ -88,5 +95,3 @@ export function CreateFlagDialog({ isOpen, onOpenChange }: CreateFlagDialogProps
         </Dialog>
     );
 }
-
-    

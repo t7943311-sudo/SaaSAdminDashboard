@@ -7,11 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
-import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import type { PlatformSettings } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2 } from 'lucide-react';
+import { logAudit } from '@/lib/audit-logger';
 
 
 const DEFAULT_SETTINGS: PlatformSettings = {
@@ -25,6 +26,7 @@ const DEFAULT_SETTINGS: PlatformSettings = {
 
 export default function AdminSettingsPage() {
     const firestore = useFirestore();
+    const { user: adminUser } = useUser();
     const settingsDocRef = useMemoFirebase(() => doc(firestore, 'platform', 'settings'), [firestore]);
     const { data: settings, isLoading, error } = useDoc<PlatformSettings>(settingsDocRef);
 
@@ -58,6 +60,12 @@ export default function AdminSettingsPage() {
                 dailySummaryReport: dailySummary,
                 failedPaymentAlerts: failedPayments,
             }, { merge: true });
+
+            logAudit(firestore, adminUser, {
+                action: 'settings.updated',
+                details: 'Platform settings were updated.'
+            });
+            
             toast({ title: 'Saved!', description: 'Settings have been updated.' });
         } catch (e: any) {
             toast({ variant: 'destructive', title: 'Error', description: 'Could not save settings.' });
