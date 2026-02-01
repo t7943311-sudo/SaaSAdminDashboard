@@ -194,9 +194,9 @@ export default function AdminUsersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading && (
-                    <TableRow>
-                        <TableCell colSpan={4} className="h-24">
+                {isLoading && Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell colSpan={1} className="py-4">
                           <div className="flex items-center gap-3">
                               <Skeleton className="h-10 w-10 rounded-full" />
                               <div>
@@ -205,8 +205,11 @@ export default function AdminUsersPage() {
                               </div>
                           </div>
                         </TableCell>
+                         <TableCell><Skeleton className="h-6 w-16" /></TableCell>
+                        <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+                        <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
                     </TableRow>
-                )}
+                ))}
                 {error && (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center text-destructive h-24">

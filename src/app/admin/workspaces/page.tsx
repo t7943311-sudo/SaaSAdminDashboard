@@ -24,8 +24,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
@@ -64,7 +64,7 @@ export default function AdminWorkspacesPage() {
         });
 
         return Array.from(workspacesMap.entries()).map(([name, members]) => {
-            const sortedMembers = members.sort((a,b) => a.createdAt?.seconds - b.createdAt?.seconds);
+            const sortedMembers = members.sort((a,b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0));
             return {
                 id: name,
                 name: name,
@@ -138,22 +138,25 @@ export default function AdminWorkspacesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading && (
-                    <TableRow>
-                        <TableCell colSpan={5} className="h-24">
-                           <div className="flex justify-between items-center">
-                                <Skeleton className="h-5 w-32" />
-                                <div className="flex items-center gap-3">
-                                  <Skeleton className="h-8 w-8 rounded-full" />
-                                  <Skeleton className="h-8 w-24" />
-                                </div>
-                                <Skeleton className="h-5 w-20" />
-                                <Skeleton className="h-5 w-24" />
-                                <Skeleton className="h-8 w-8" />
-                           </div>
+                {isLoading && Array.from({length: 3}).map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell colSpan={1} className="py-4">
+                           <Skeleton className="h-5 w-32" />
                         </TableCell>
+                        <TableCell>
+                             <div className="flex items-center gap-3">
+                                <Skeleton className="h-8 w-8 rounded-full" />
+                                <div className="space-y-1">
+                                    <Skeleton className="h-4 w-24" />
+                                    <Skeleton className="h-3 w-32" />
+                                </div>
+                            </div>
+                        </TableCell>
+                         <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+                         <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                        <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
                     </TableRow>
-                )}
+                ))}
                 {error && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center text-destructive h-24">
