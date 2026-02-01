@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,6 +16,13 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { generateTemplate } from "./actions";
 import { Bot, Loader2 } from "lucide-react";
+import {
+  useUser,
+  useFirestore,
+  errorEmitter,
+  FirestorePermissionError,
+} from "@/firebase";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -35,18 +42,69 @@ function SubmitButton() {
 
 export default function TemplatesPage() {
   const { toast } = useToast();
-  const initialState = { success: false, message: "", template: "" };
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const initialState = { success: false, message: "", template: "", prompt: "" };
   const [state, formAction] = useFormState(generateTemplate, initialState);
+  const savedPromptRef = useRef<string | undefined>();
 
   useEffect(() => {
-    if (!state.success && state.message) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: state.message,
-      });
+    if (
+      state.success &&
+      state.template &&
+      state.prompt &&
+      state.prompt !== savedPromptRef.current &&
+      user &&
+      firestore
+    ) {
+      savedPromptRef.current = state.prompt;
+
+      const templatesCollection = collection(
+        firestore,
+        `users/${user.uid}/templates`
+      );
+      const templateData = {
+        userId: user.uid,
+        prompt: state.prompt,
+        content: state.template,
+        createdAt: serverTimestamp(),
+      };
+
+      addDoc(templatesCollection, templateData)
+        .then(() => {
+          toast({
+            title: "Template Saved",
+            description: "Your new template has been saved to your collection.",
+          });
+        })
+        .catch((e) => {
+          savedPromptRef.current = undefined; // Allow retry on failure
+          const permissionError = new FirestorePermissionError({
+            path: templatesCollection.path,
+            operation: "create",
+            requestResourceData: templateData,
+          });
+          errorEmitter.emit("permission-error", permissionError);
+          toast({
+            variant: "destructive",
+            title: "Error Saving Template",
+            description:
+              "Could not save the generated template. You may not have permissions.",
+          });
+        });
     }
-  }, [state, toast]);
+
+    if (!state.success && state.message) {
+      // Only show toast if the message is new for this submission
+      if (state.prompt && state.prompt !== savedPromptRef.current) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: state.message,
+        });
+      }
+    }
+  }, [state, user, firestore, toast]);
 
   return (
     <div className="grid gap-6">
@@ -55,8 +113,7 @@ export default function TemplatesPage() {
           <CardHeader>
             <CardTitle>AI Template Generator</CardTitle>
             <CardDescription>
-              Describe the template you want to create. Be as specific as
-              possible. This is a feature of Stellar.
+              Describe the template you want to create. The generated template will be automatically saved to your collection.
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -11,6 +11,7 @@ type State = {
   success: boolean;
   message: string;
   template?: string;
+  prompt?: string;
 };
 
 export async function generateTemplate(
@@ -35,6 +36,7 @@ export async function generateTemplate(
         success: true,
         message: "Template generated successfully.",
         template: result.template,
+        prompt: validatedFields.data.prompt,
       };
     } else {
       return { success: false, message: "Failed to generate template." };

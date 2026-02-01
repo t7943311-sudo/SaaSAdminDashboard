@@ -8,16 +8,18 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import {
+  BarChart2,
+  Bot,
   CreditCard,
   LayoutGrid,
   Settings,
   Users,
-  BarChart2
 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", icon: <LayoutGrid />, label: "Dashboard" },
   { href: "/dashboard/analytics", icon: <BarChart2 />, label: "Analytics" },
+  { href: "/dashboard/templates", icon: <Bot />, label: "Templates" },
   { href: "/dashboard/users", icon: <Users />, label: "Users & Teams" },
   { href: "/dashboard/billing", icon: <CreditCard />, label: "Billing" },
   { href: "/dashboard/settings", icon: <Settings />, label: "Settings" },
