@@ -23,12 +23,66 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUser, useFirestore, useCollection, useMemoFirebase, errorEmitter, FirestorePermissionError } from '@/firebase';
-import { collection, query, where, doc, updateDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, query, where, doc, updateDoc, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore';
 import type { Subscription, SubscriptionPlan, Invoice } from '@/lib/types';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { ChangePlanDialog } from '@/components/dashboard/billing/change-plan-dialog';
 import { CancelSubscriptionDialog } from '@/components/dashboard/billing/cancel-subscription-dialog';
+
+
+// --- Demo Data ---
+const demoPlans: SubscriptionPlan[] = [
+  {
+    id: 'plan_free_demo',
+    name: 'Free',
+    price: 0,
+    priceId: 'price_free_demo',
+    features: [
+      'For personal projects',
+      '1,000 AI generations/mo',
+      '2 projects',
+      'Basic support',
+    ],
+    isPopular: false,
+  },
+  {
+    id: 'plan_pro_demo',
+    name: 'Pro',
+    price: 29,
+    priceId: 'price_pro_monthly_demo',
+    isPopular: true,
+    features: [
+      'For professionals & small teams',
+      '10,000 AI generations/mo',
+      'Unlimited projects',
+      'Priority support',
+      'Advanced analytics'
+    ],
+  },
+  {
+    id: 'plan_enterprise_demo',
+    name: 'Enterprise',
+    price: 99,
+    priceId: 'price_enterprise_monthly_demo',
+    features: [
+      'For large-scale applications',
+      'Unlimited AI generations',
+      'Dedicated support & SSO',
+      'Custom integrations',
+      'Team management',
+    ],
+    isPopular: false
+  },
+];
+
+const mockInvoices = (userId: string): Invoice[] => [
+    { id: 'inv_demo_1', userId, subscriptionId: 'sub_demo', date: Timestamp.fromDate(new Date('2024-07-01')), amount: 2900, status: 'paid', invoiceUrl: '#'},
+    { id: 'inv_demo_2', userId, subscriptionId: 'sub_demo', date: Timestamp.fromDate(new Date('2024-06-01')), amount: 2900, status: 'paid', invoiceUrl: '#'},
+    { id: 'inv_demo_3', userId, subscriptionId: 'sub_demo', date: Timestamp.fromDate(new Date('2024-05-01')), amount: 2900, status: 'paid', invoiceUrl: '#'},
+];
+// --- End Demo Data ---
+
 
 export default function BillingPage() {
   const { user } = useUser();
@@ -42,7 +96,7 @@ export default function BillingPage() {
 
   // Fetch all available plans
   const plansQuery = useMemoFirebase(() => collection(firestore, 'subscriptionPlans'), [firestore]);
-  const { data: plans, isLoading: isLoadingPlans } = useCollection<SubscriptionPlan>(plansQuery);
+  const { data: plansFromDb, isLoading: isLoadingPlans } = useCollection<SubscriptionPlan>(plansQuery);
 
   // Fetch user's active subscription
   const subscriptionQuery = useMemoFirebase(() => {
@@ -50,21 +104,46 @@ export default function BillingPage() {
     return query(collection(firestore, `users/${user.uid}/subscriptions`), where("status", "in", ["active", "trialing", "past_due"]));
   }, [firestore, user]);
   const { data: subscriptions, isLoading: isLoadingSubscription } = useCollection<Subscription>(subscriptionQuery);
-  const activeSubscription = subscriptions?.[0];
+  let activeSubscription = subscriptions?.[0];
 
   // Fetch user's invoices
   const invoicesQuery = useMemoFirebase(() => {
       if (!user) return null;
       return query(collection(firestore, `users/${user.uid}/invoices`));
   }, [firestore, user]);
-  const { data: invoices, isLoading: isLoadingInvoices } = useCollection<Invoice>(invoicesQuery);
+  const { data: invoicesFromDb, isLoading: isLoadingInvoices } = useCollection<Invoice>(invoicesQuery);
+  let invoices = invoicesFromDb;
 
+  const isDemoMode = !isLoadingSubscription && !activeSubscription && user;
+
+  if (isDemoMode) {
+    activeSubscription = {
+        id: 'sub_demo',
+        userId: user.uid,
+        planId: 'plan_pro_demo',
+        priceId: 'price_pro_monthly_demo',
+        status: 'active',
+        currentPeriodStart: Timestamp.fromDate(new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)),
+        currentPeriodEnd: Timestamp.fromDate(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)),
+        cancelAtPeriodEnd: false,
+        createdAt: Timestamp.fromDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
+        updatedAt: Timestamp.fromDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
+    };
+    if (!invoices || invoices.length === 0) {
+        invoices = mockInvoices(user.uid);
+    }
+  }
+  
+  const plans = (plansFromDb && plansFromDb.length > 0) ? plansFromDb : demoPlans;
   const currentPlan = plans?.find(p => p.id === activeSubscription?.planId);
 
   const handlePlanSelect = (plan: SubscriptionPlan) => {
+    if (isDemoMode) {
+      toast({ title: 'This is a demo', description: 'In a real app, this would open the checkout flow to change your plan.' });
+      return;
+    }
     if (plan.id === currentPlan?.id) return;
     if (plan.name === 'Enterprise') {
-        // In a real app, this would open a contact form or a different flow
         toast({ title: 'Contact Sales', description: 'Please contact our sales team to learn more about the Enterprise plan.' });
         return;
     }
@@ -77,16 +156,12 @@ export default function BillingPage() {
     setIsChangingPlan(true);
     const subDocRef = doc(firestore, `users/${user.uid}/subscriptions/${activeSubscription.id}`);
     
-    // In a real app, you would create a Stripe Checkout session here
-    // and handle the subscription update via a webhook.
-    // For this starter kit, we'll simulate the update directly.
     updateDoc(subDocRef, {
       planId: selectedPlan.id,
       priceId: selectedPlan.priceId,
       status: 'active',
-      cancelAtPeriodEnd: false, // Re-activate if it was cancelled
+      cancelAtPeriodEnd: false,
       updatedAt: serverTimestamp(),
-      // You might also want to update currentPeriodStart/End here
     })
     .then(() => {
       toast({ title: "Plan Changed", description: `You are now on the ${selectedPlan.name} plan.`});
@@ -131,6 +206,10 @@ export default function BillingPage() {
 
   const handleReactivateSubscription = () => {
       if (!user || !activeSubscription) return;
+      if (isDemoMode) {
+        toast({ title: 'This is a demo', description: 'This action is disabled in demo mode.' });
+        return;
+      }
       const subDocRef = doc(firestore, `users/${user.uid}/subscriptions/${activeSubscription.id}`);
       updateDoc(subDocRef, {
           cancelAtPeriodEnd: false,
@@ -142,9 +221,8 @@ export default function BillingPage() {
       });
   }
 
-  // Dummy usage data
   const usage = {
-    generations: { used: 1200, limit: 5000 },
+    generations: { used: 1200, limit: 10000 },
     projects: { used: 8, limit: Infinity },
   }
 
@@ -180,10 +258,11 @@ export default function BillingPage() {
                 {currentPlan ? `You are currently on the ` : 'You are not subscribed to any plan.'}
                 {currentPlan && <span className="font-semibold text-primary">{currentPlan.name}</span>}
                 {activeSubscription?.cancelAtPeriodEnd && ' (Cancels on ' + format(activeSubscription.currentPeriodEnd.toDate(), 'PPP') + ')'}
+                 {isDemoMode && <Badge variant="outline" className="ml-2">Demo</Badge>}
               </CardDescription>
             )}
           </CardHeader>
-          {currentPlan && activeSubscription && (
+          {(currentPlan && activeSubscription) && (
             <>
             <CardContent className="space-y-6">
               <div>
@@ -198,17 +277,23 @@ export default function BillingPage() {
                   <span className="text-sm text-muted-foreground">Projects</span>
                   <span className="text-sm font-medium">{usage.projects.used} / Unlimited</span>
                 </div>
-                <Progress value={100} />
+                <Progress value={40} />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <p className="text-sm text-muted-foreground">
-                Your plan renews on <span className="font-medium text-foreground">{format(activeSubscription.currentPeriodEnd.toDate(), 'PPP')}</span>.
+                Your plan {activeSubscription.cancelAtPeriodEnd ? 'expires' : 'renews'} on <span className="font-medium text-foreground">{format(activeSubscription.currentPeriodEnd.toDate(), 'PPP')}</span>.
               </p>
               {activeSubscription.cancelAtPeriodEnd ? (
                   <Button variant="outline" onClick={handleReactivateSubscription}>Reactivate Subscription</Button>
               ) : (
-                  <Button variant="outline" onClick={() => setShowCancelDialog(true)}>Cancel Subscription</Button>
+                  <Button variant="outline" onClick={() => {
+                      if (isDemoMode) {
+                        toast({ title: 'This is a demo', description: 'This action is disabled in demo mode.' });
+                        return;
+                      }
+                      setShowCancelDialog(true)
+                    }}>Cancel Subscription</Button>
               )}
             </CardFooter>
             </>
@@ -225,7 +310,7 @@ export default function BillingPage() {
           </p>
         </div>
 
-        {isLoadingPlans ? (
+        {isLoadingPlans && !isDemoMode ? (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                 <Skeleton className="h-96 w-full" />
                 <Skeleton className="h-96 w-full" />
@@ -233,9 +318,24 @@ export default function BillingPage() {
             </div>
         ) : (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {plans?.sort((a,b) => a.price - b.price).map((plan) => (
+            {plans?.sort((a,b) => a.price - b.price).map((plan) => {
+              
+              let buttonText;
+              if (plan.id === currentPlan?.id) {
+                buttonText = "Current Plan";
+              } else if (plan.name === 'Enterprise') {
+                buttonText = "Contact Sales";
+              } else if (!currentPlan) {
+                 buttonText = "Choose Plan";
+              } else if (plan.price > currentPlan.price) {
+                buttonText = `Upgrade to ${plan.name}`;
+              } else {
+                buttonText = `Downgrade to ${plan.name}`;
+              }
+
+              return (
               <Card
-                key={plan.name}
+                key={plan.id}
                 className={`flex flex-col relative ${
                   plan.id === currentPlan?.id ? "border-primary ring-2 ring-primary" : ""
                 } ${plan.isPopular ? "border-primary" : ""}`}
@@ -272,17 +372,11 @@ export default function BillingPage() {
                     disabled={plan.id === currentPlan?.id || isLoadingSubscription}
                     onClick={() => handlePlanSelect(plan)}
                   >
-                    {isLoadingSubscription ? <Loader2 className="animate-spin" /> : (
-                      plan.id === currentPlan?.id
-                        ? "Current Plan"
-                        : plan.name === "Enterprise"
-                        ? "Contact Sales"
-                        : currentPlan && plan.price > currentPlan.price ? "Upgrade to " + plan.name : "Downgrade to " + plan.name
-                    )}
+                    {isLoadingSubscription ? <Loader2 className="animate-spin" /> : buttonText}
                   </Button>
                 </CardFooter>
               </Card>
-            ))}
+            )})}
           </div>
         )}
 
@@ -303,7 +397,7 @@ export default function BillingPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoadingInvoices ? (
+                {isLoadingInvoices && !isDemoMode ? (
                     <TableRow>
                         <TableCell colSpan={5} className="py-8">
                             <div className="flex justify-center"><Loader2 className="animate-spin" /></div>
@@ -312,7 +406,7 @@ export default function BillingPage() {
                 ) : invoices && invoices.length > 0 ? (
                   invoices.map((invoice) => (
                     <TableRow key={invoice.id}>
-                      <TableCell className="font-medium">#{invoice.id.substring(0, 7)}</TableCell>
+                      <TableCell className="font-medium">#{invoice.id.substring(0, 7)}...</TableCell>
                       <TableCell>{format(invoice.date.toDate(), 'PPP')}</TableCell>
                       <TableCell>${(invoice.amount / 100).toFixed(2)}</TableCell>
                       <TableCell>
