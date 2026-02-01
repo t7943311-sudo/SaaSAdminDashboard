@@ -15,7 +15,7 @@ export function PageTOC() {
 
   useEffect(() => {
     const headingElements = Array.from(
-      document.querySelectorAll<HTMLHeadingElement>('main h2, main h3')
+      document.querySelectorAll<HTMLHeadingElement>('main h2[id], main h3[id]')
     );
 
     const toc = headingElements.map(heading => ({
