@@ -270,7 +270,7 @@ export default function SettingsPage() {
                                   </div>
                               </TableCell>
                               <TableCell>
-                                  <Select defaultValue={member.role}>
+                                  <Select defaultValue={member.role} onValueChange={() => toast({ title: 'Demo Only', description: 'Changing roles is not implemented in this demo section.' })}>
                                   <SelectTrigger className="w-[120px]">
                                       <SelectValue placeholder="Select role" />
                                   </SelectTrigger>
@@ -281,7 +281,7 @@ export default function SettingsPage() {
                                   </Select>
                               </TableCell>
                               <TableCell className="text-right">
-                                  <Button variant="ghost" size="sm">Remove</Button>
+                                  <Button variant="ghost" size="sm" onClick={() => toast({ title: 'Demo Only', description: 'Removing users is not implemented in this demo section.' })}>Remove</Button>
                               </TableCell>
                               </TableRow>
                           ))}
@@ -398,7 +398,7 @@ export default function SettingsPage() {
                                       <TableCell><code>{apiKey.key}</code></TableCell>
                                       <TableCell>{apiKey.created}</TableCell>
                                       <TableCell className="text-right">
-                                          <Button variant="ghost" size="sm">Revoke</Button>
+                                          <Button variant="ghost" size="sm" onClick={() => toast({ title: 'Feature coming soon!' })}>Revoke</Button>
                                       </TableCell>
                                   </TableRow>
                                   ))}
