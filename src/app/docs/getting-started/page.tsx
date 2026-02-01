@@ -25,7 +25,7 @@ export default function GettingStartedPage() {
       
       <h3 id="step-1-install-dependencies">1. Install Dependencies</h3>
         <p>
-          First, navigate to your project directory in your terminal and install the necessary Node.js dependencies.
+          First, navigate to your project directory in your terminal and install the necessary Node.js dependencies. This will download all the required packages for the project to run.
         </p>
         <CodeBlock code={'npm install'} lang="bash" />
       
@@ -41,7 +41,7 @@ export default function GettingStartedPage() {
         </p>
         <ol>
             <li>Go to the <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer">Firebase Console</a> and create a new project.</li>
-            <li>In your new project, create a new <strong>Web App</strong>.</li>
+            <li>In your new project, create a new <strong>Web App</strong>. This will generate the credentials your web application needs to communicate with Firebase services.</li>
             <li>After creating the web app, Firebase will provide you with a `firebaseConfig` object. Copy this object.</li>
             <li>Paste the copied `firebaseConfig` object into the <code>src/firebase/config.ts</code> file, replacing the placeholder content.</li>
         </ol>
@@ -53,14 +53,14 @@ export default function GettingStartedPage() {
         </p>
          <ul>
             <li>
-                <strong>Authentication:</strong> Go to the "Authentication" section (under "Build"), click "Get started", and on the "Sign-in method" tab, enable the **Email/Password** and **Google** providers.
+                <strong>Authentication:</strong> This service handles user sign-up and login. Go to the "Authentication" section (under "Build"), click "Get started", and on the "Sign-in method" tab, enable the <strong>Email/Password</strong> and <strong>Google</strong> providers.
             </li>
             <li>
-                <strong>Firestore Database:</strong> Go to the "Firestore Database" section (under "Build"), click "Create database", and start in **Production mode**. Choose a location close to your users. The security rules will be deployed later.
+                <strong>Firestore Database:</strong> This is the main database for your application. Go to the "Firestore Database" section (under "Build"), click "Create database", and start in <strong>Production mode</strong>. Choose a location close to your users.
             </li>
         </ul>
         <Callout variant="warning">
-            When you create your Firestore database, it will ask you to set up security rules. You can start with the default deny-all rules. The <code>firestore.rules</code> file in this project contains the necessary rules for the application to function correctly, which you should deploy to your project.
+            Your Firestore database needs security rules to protect your data. This starter kit includes a ready-to-use rules file at the root of the project: <code>firestore.rules</code>. You must deploy these rules to your project. You can do this by going to the "Rules" tab in the Firestore Database section of the Firebase Console, copying the content of the file, and pasting it into the editor.
         </Callout>
 
       <h3 id="step-4-run-the-development-server">4. Run the Development Server</h3>
