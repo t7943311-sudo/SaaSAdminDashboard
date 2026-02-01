@@ -65,6 +65,16 @@ service cloud.firestore {
     }
 
     /**
+     * @description   Allows admins to perform collection group queries across all 'subscriptions'.
+     * @path          /{path=**}/subscriptions/{subscriptionId}
+     * @allow         (get, list) An admin user.
+     * @principle     Enables platform-wide querying for administrative purposes like the global subscriptions page.
+     */
+    match /{path=**}/subscriptions/{subscriptionId} {
+      allow get, list: if isAdmin();
+    }
+
+    /**
      * @description   Stores user profile information.
      * @path          /users/{userId}
      * @allow         (create) An authenticated user creating their own profile document.
@@ -181,5 +191,3 @@ service cloud.firestore {
     }
   }
 }
-
-    
