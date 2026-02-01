@@ -10,6 +10,18 @@ import {
   CardTitle,
   CardFooter
 } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -37,20 +49,71 @@ import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCre
 import type { User as UserType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MoreVertical, KeyRound, Copy, PlusCircle, Webhook, BookMarked } from 'lucide-react';
 import { InviteUserDialog } from '@/components/dashboard/users/invite-user-dialog';
+import { placeholderImages } from '@/lib/placeholder-images';
+import { Badge } from '@/components/ui/badge';
 
 const teamMembers = [
-    { name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin', avatar: 'https://picsum.photos/seed/1/40/40'},
-    { name: 'Bob Williams', email: 'bob@example.com', role: 'Member', avatar: 'https://picsum.photos/seed/2/40/40'},
-    { name: 'Charlie Brown', email: 'charlie@example.com', role: 'Member', avatar: 'https://picsum.photos/seed/3/40/40'},
+    { id: 'team-member-1', name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin' },
+    { id: 'team-member-2', name: 'Bob Williams', email: 'bob@example.com', role: 'Member' },
+    { id: 'team-member-3', name: 'Charlie Brown', email: 'charlie@example.com', role: 'Member' },
 ];
 
 const apiKeys = [
-    { name: 'Primary Key', key: 'pk_live_****************', created: 'Jan 1, 2024' },
-    { name: 'Test Key', key: 'sk_test_****************', created: 'Dec 15, 2023' },
+    { name: 'Primary Live Key', key: 'pk_live_******************', created: 'Jan 1, 2024', lastUsed: '5m ago', scope: 'Full Access', status: 'Active' },
+    { name: 'Read-only Analytics Key', key: 'pk_live_******************', created: 'Feb 15, 2024', lastUsed: '2 days ago', scope: 'Read-only', status: 'Active' },
+    { name: 'Old Test Key', key: 'sk_test_******************', created: 'Dec 1, 2023', lastUsed: '3 months ago', scope: 'Test Data', status: 'Revoked' },
 ];
 
+const webhooks = [
+    { id: 'wh_1', url: 'https://api.example.com/v1/webhooks/users', status: 'Active', events: 3, lastDelivery: '2m ago', deliveryStatus: 'Success' },
+    { id: 'wh_2', url: 'https://api.another.com/notifications', status: 'Failing', events: 1, lastDelivery: '1h ago', deliveryStatus: 'Failed' },
+];
+
+const eventReferences = [
+    {
+        name: 'user.created',
+        description: 'Fires whenever a new user is created in your application, either through sign-up or by an admin.',
+        payload: `{
+  "event": "user.created",
+  "data": {
+    "id": "usr_12345",
+    "email": "new.user@example.com",
+    "firstName": "John",
+    "createdAt": "2024-01-01T12:00:00Z"
+  }
+}`
+    },
+    {
+        name: 'subscription.updated',
+        description: 'Fires when a subscription is created, upgraded, downgraded, or canceled.',
+        payload: `{
+  "event": "subscription.updated",
+  "data": {
+    "id": "sub_67890",
+    "userId": "usr_12345",
+    "planId": "plan_pro",
+    "status": "active",
+    "currentPeriodEnd": "2025-01-01T12:00:00Z"
+  }
+}`
+    },
+    {
+        name: 'invoice.paid',
+        description: 'Fires when an invoice has been successfully paid.',
+        payload: `{
+  "event": "invoice.paid",
+  "data": {
+    "id": "inv_abcde",
+    "subscriptionId": "sub_67890",
+    "amount": 2900,
+    "currency": "usd",
+    "paidAt": "2024-01-01T12:00:00Z"
+  }
+}`
+    }
+];
 
 export default function SettingsPage() {
   const { user, isUserLoading } = useUser();
@@ -177,7 +240,7 @@ export default function SettingsPage() {
             <TabsTrigger value="account" className="w-full justify-start data-[state=active]:bg-muted">Account & Workspace</TabsTrigger>
             <TabsTrigger value="security" className="w-full justify-start data-[state=active]:bg-muted">Security</TabsTrigger>
             <TabsTrigger value="notifications" className="w-full justify-start data-[state=active]:bg-muted">Notifications</TabsTrigger>
-            <TabsTrigger value="api-keys" className="w-full justify-start data-[state=active]:bg-muted">API Keys</TabsTrigger>
+            <TabsTrigger value="developer" className="w-full justify-start data-[state=active]:bg-muted">Developer</TabsTrigger>
             <TabsTrigger value="appearance" className="w-full justify-start data-[state=active]:bg-muted">Appearance</TabsTrigger>
           </TabsList>
           <div className="w-full">
@@ -255,12 +318,14 @@ export default function SettingsPage() {
                           </TableRow>
                           </TableHeader>
                           <TableBody>
-                          {teamMembers.map((member) => (
+                          {teamMembers.map((member) => {
+                             const avatarImage = placeholderImages.find(p => p.id === member.id);
+                             return (
                               <TableRow key={member.email}>
                               <TableCell>
                                   <div className="flex items-center gap-3">
                                       <Avatar>
-                                          <AvatarImage src={member.avatar} />
+                                          {avatarImage && <AvatarImage src={avatarImage.imageUrl} />}
                                           <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
                                       </Avatar>
                                       <div>
@@ -284,7 +349,7 @@ export default function SettingsPage() {
                                   <Button variant="ghost" size="sm" onClick={() => toast({ title: 'Demo Only', description: 'Removing users is not implemented in this demo section.' })}>Remove</Button>
                               </TableCell>
                               </TableRow>
-                          ))}
+                          )})}
                           </TableBody>
                       </Table>
                       </CardContent>
@@ -375,40 +440,151 @@ export default function SettingsPage() {
                   </Card>
               </TabsContent>
 
-              <TabsContent value="api-keys" className="mt-0">
-                  <Card>
-                      <CardHeader>
-                          <CardTitle>API Keys</CardTitle>
-                          <CardDescription>Manage your API keys for programmatic access. (Demo)</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                          <Table>
-                              <TableHeader>
-                                  <TableRow>
-                                      <TableHead>Key Name</TableHead>
-                                      <TableHead>Key</TableHead>
-                                      <TableHead>Created</TableHead>
-                                      <TableHead className="text-right">Action</TableHead>
-                                  </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                  {apiKeys.map((apiKey) => (
-                                  <TableRow key={apiKey.key}>
-                                      <TableCell className="font-medium">{apiKey.name}</TableCell>
-                                      <TableCell><code>{apiKey.key}</code></TableCell>
-                                      <TableCell>{apiKey.created}</TableCell>
-                                      <TableCell className="text-right">
-                                          <Button variant="ghost" size="sm" onClick={() => toast({ title: 'Feature coming soon!' })}>Revoke</Button>
-                                      </TableCell>
-                                  </TableRow>
-                                  ))}
-                              </TableBody>
-                          </Table>
-                      </CardContent>
-                      <CardFooter>
-                          <Button onClick={() => toast({ title: 'Feature coming soon!' })}>Generate new key</Button>
-                      </CardFooter>
-                  </Card>
+              <TabsContent value="developer" className="mt-0">
+                  <Tabs defaultValue="api-keys" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="api-keys">API Keys</TabsTrigger>
+                        <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+                        <TabsTrigger value="events">Events & Logs</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="api-keys" className="mt-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>API Keys</CardTitle>
+                                <CardDescription>Manage your API keys for programmatic access. Keys are for demo purposes only.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Key Name</TableHead>
+                                            <TableHead>Key</TableHead>
+                                            <TableHead>Scope</TableHead>
+                                            <TableHead>Created</TableHead>
+                                            <TableHead>Last Used</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {apiKeys.map((apiKey) => (
+                                        <TableRow key={apiKey.key}>
+                                            <TableCell className="font-medium flex items-center gap-2">
+                                                <div className={`w-2 h-2 rounded-full ${apiKey.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                                {apiKey.name}
+                                            </TableCell>
+                                            <TableCell><code className="font-mono">{apiKey.key}</code></TableCell>
+                                            <TableCell><Badge variant="secondary">{apiKey.scope}</Badge></TableCell>
+                                            <TableCell>{apiKey.created}</TableCell>
+                                            <TableCell>{apiKey.lastUsed}</TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem onClick={() => toast({ title: 'Feature coming soon!' })}>Edit Permissions</DropdownMenuItem>
+                                                        <DropdownMenuItem className="text-destructive" onClick={() => toast({ title: 'Feature coming soon!' })}>Revoke Key</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                            <CardFooter className="justify-between">
+                                <p className="text-sm text-muted-foreground">Never share your secret keys publicly.</p>
+                                <Button onClick={() => toast({ title: 'Feature coming soon!', description: 'Key generation is not yet available in this demo.' })}>
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Generate new key
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </TabsContent>
+                    <TabsContent value="webhooks" className="mt-6">
+                        <Card>
+                             <CardHeader>
+                                <CardTitle>Webhooks</CardTitle>
+                                <CardDescription>Manage webhook endpoints for receiving events from your application.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Endpoint URL</TableHead>
+                                            <TableHead>Subscribed Events</TableHead>
+                                            <TableHead>Last Delivery</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {webhooks.map((webhook) => (
+                                            <TableRow key={webhook.id}>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className={`w-2 h-2 rounded-full ${webhook.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                                        <code className="font-mono">{webhook.url}</code>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell><Badge variant="outline">{webhook.events} events</Badge></TableCell>
+                                                <TableCell className="flex items-center gap-2">
+                                                    <Badge variant={webhook.deliveryStatus === 'Success' ? 'secondary' : 'destructive'}>{webhook.deliveryStatus}</Badge>
+                                                    <span className="text-muted-foreground">{webhook.lastDelivery}</span>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem onClick={() => toast({ title: 'Feature coming soon!' })}>View Deliveries</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => toast({ title: 'Feature coming soon!' })}>Edit Endpoint</DropdownMenuItem>
+                                                            <DropdownMenuItem className="text-destructive" onClick={() => toast({ title: 'Feature coming soon!' })}>Delete Endpoint</DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                            <CardFooter>
+                                <Button onClick={() => toast({ title: 'Feature coming soon!', description: 'Adding webhooks is not available in this demo.' })}>
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Add Webhook Endpoint
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </TabsContent>
+                    <TabsContent value="events" className="mt-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Events Reference</CardTitle>
+                                <CardDescription>A reference of all events that can be sent to your webhook endpoints.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                               <Accordion type="single" collapsible className="w-full">
+                                {eventReferences.map((event, index) => (
+                                    <AccordionItem key={index} value={`item-${index}`}>
+                                        <AccordionTrigger>
+                                            <div className="flex items-center gap-2 font-mono text-sm">
+                                                <Webhook className="h-4 w-4 text-primary" />
+                                                {event.name}
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <p className="mb-4 text-muted-foreground">{event.description}</p>
+                                            <pre className="bg-secondary p-4 rounded-md text-xs overflow-x-auto font-mono">
+                                                <code>{event.payload}</code>
+                                            </pre>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                ))}
+                               </Accordion>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                  </Tabs>
               </TabsContent>
 
               <TabsContent value="appearance" className="mt-0">
