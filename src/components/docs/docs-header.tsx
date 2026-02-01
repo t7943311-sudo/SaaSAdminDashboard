@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/firebase';
 
-export function DocsHeader() {
+export function DocsHeader({ sectionTitle = "Docs" }: { sectionTitle?: string }) {
   const { user, isUserLoading } = useUser();
 
   return (
@@ -20,7 +20,7 @@ export function DocsHeader() {
           </Link>
           <span className="text-2xl text-muted-foreground/50">/</span>
           <span className="text-lg font-medium text-muted-foreground">
-            Docs
+            {sectionTitle}
           </span>
         </div>
 

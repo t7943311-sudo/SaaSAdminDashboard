@@ -117,7 +117,7 @@ const faqs = [
     },
     {
         q: "Is support included?",
-        a: "Yes, the purchase includes 6 months of email support for any questions related to the starter kit's architecture, features, and implementation.",
+        a: "Yes, the purchase includes 6 months of email support for any questions related to the starter kit's features, and implementation.",
     }
 ]
 
@@ -456,13 +456,10 @@ export default function LandingPage() {
             <Link href="/docs" className="text-sm text-muted-foreground hover:text-foreground">
               Docs
             </Link>
-             <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
-              License
-            </Link>
-            <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+            <Link href="/legal/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground">
               Privacy
             </Link>
-             <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+            <Link href="/legal/terms-of-service" className="text-sm text-muted-foreground hover:text-foreground">
               Terms
             </Link>
           </div>
