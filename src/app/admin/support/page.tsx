@@ -1,9 +1,10 @@
 'use client';
+import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, KeyRound, Search, ShieldAlert } from "lucide-react";
+import { KeyRound, ShieldAlert } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -13,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from '@/hooks/use-toast';
 
 // Placeholder Data
 const supportTickets = [
@@ -22,6 +24,25 @@ const supportTickets = [
 ];
 
 export default function AdminSupportPage() {
+    const [impersonateEmail, setImpersonateEmail] = useState('');
+    const [impersonateReason, setImpersonateReason] = useState('');
+    const { toast } = useToast();
+
+    const handleImpersonate = () => {
+        if (!impersonateEmail || !impersonateReason) {
+            toast({
+                variant: 'destructive',
+                title: 'Missing Information',
+                description: 'Please provide both a user email and a reason for impersonation.',
+            });
+            return;
+        }
+        toast({
+            title: 'Impersonation Session (Demo)',
+            description: `In a real app, this would securely start an impersonation session for ${impersonateEmail}. All actions would be audited with the reason: "${impersonateReason}".`,
+        });
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -45,11 +66,11 @@ export default function AdminSupportPage() {
                     <div className="max-w-md space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="impersonate-email">User Email</Label>
-                            <Input id="impersonate-email" type="email" placeholder="user@example.com" />
+                            <Input id="impersonate-email" type="email" placeholder="user@example.com" value={impersonateEmail} onChange={(e) => setImpersonateEmail(e.target.value)} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="impersonate-reason">Reason</Label>
-                            <Input id="impersonate-reason" placeholder="e.g., Debugging billing issue TKT-123" />
+                            <Input id="impersonate-reason" placeholder="e.g., Debugging billing issue TKT-123" value={impersonateReason} onChange={(e) => setImpersonateReason(e.target.value)} />
                         </div>
                         <div className="flex items-start gap-3 rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 text-amber-200">
                              <ShieldAlert className="w-8 h-8 mt-1 text-amber-500" />
@@ -63,7 +84,7 @@ export default function AdminSupportPage() {
                     </div>
                 </CardContent>
                 <CardFooter>
-                    <Button variant="destructive">
+                    <Button variant="destructive" onClick={handleImpersonate}>
                         <KeyRound className="mr-2" /> Start Impersonation Session
                     </Button>
                 </CardFooter>
