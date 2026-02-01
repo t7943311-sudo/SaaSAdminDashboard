@@ -18,7 +18,7 @@ import {
 const navItems = [
   { href: "/dashboard", icon: <LayoutGrid />, label: "Dashboard" },
   { href: "/dashboard/analytics", icon: <BarChart2 />, label: "Analytics" },
-  { href: "/dashboard/users", icon: <Users />, label: "Users" },
+  { href: "/dashboard/users", icon: <Users />, label: "Users & Teams" },
   { href: "/dashboard/billing", icon: <CreditCard />, label: "Billing" },
   { href: "/dashboard/settings", icon: <Settings />, label: "Settings" },
 ];

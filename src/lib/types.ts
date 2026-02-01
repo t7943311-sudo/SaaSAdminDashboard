@@ -4,6 +4,8 @@ export type User = {
     firstName?: string;
     lastName?: string;
     role?: 'admin' | 'member';
+    avatar?: string;
+    status?: 'Active' | 'Pending' | 'Disabled';
     createdAt: any; 
     updatedAt: any;
     onboardingCompleted?: boolean;

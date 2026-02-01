@@ -29,7 +29,6 @@ import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import type { User as FirebaseUserEntity } from "@/lib/types";
 
-
 export default function UsersPage() {
     const firestore = useFirestore();
     const usersCollection = useMemoFirebase(() => collection(firestore, 'users'), [firestore]);
@@ -39,12 +38,25 @@ export default function UsersPage() {
         return `${firstName?.charAt(0) ?? ''}${lastName?.charAt(0) ?? ''}`.toUpperCase();
     }
 
+    const getStatusClass = (status?: string) => {
+        switch (status) {
+            case 'Active':
+                return 'bg-green-500';
+            case 'Pending':
+                return 'bg-amber-500';
+            case 'Disabled':
+                return 'bg-red-500';
+            default:
+                return 'bg-gray-500';
+        }
+    }
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Users</h1>
-            <p className="text-muted-foreground">Manage all users in your application.</p>
+            <h1 className="text-2xl md:text-3xl font-bold">Users & Teams</h1>
+            <p className="text-muted-foreground">Manage users, roles, and teams in your organization.</p>
         </div>
         <div className="flex gap-2">
             <Button variant="outline">
@@ -53,7 +65,7 @@ export default function UsersPage() {
             </Button>
             <Button>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Add User
+                Invite User
             </Button>
         </div>
       </div>
@@ -99,6 +111,7 @@ export default function UsersPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar>
+                        <AvatarImage src={user.avatar || `https://picsum.photos/seed/${user.id}/40/40`} alt={`${user.firstName} ${user.lastName}`} />
                         <AvatarFallback>{getInitials(user.firstName, user.lastName)}</AvatarFallback>
                       </Avatar>
                       <div>
@@ -115,9 +128,9 @@ export default function UsersPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={'secondary'}>
-                      <div className={`w-2 h-2 rounded-full mr-2 bg-green-500`}></div>
-                      Active
+                    <Badge variant={'secondary'} className="flex items-center w-fit">
+                      <div className={`w-2 h-2 rounded-full mr-2 ${getStatusClass(user.status)}`}></div>
+                      {user.status || 'Pending'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -129,11 +142,11 @@ export default function UsersPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem>Edit Role</DropdownMenuItem>
                         <DropdownMenuItem>View Details</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive">
-                          Delete
+                          Remove User
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -147,5 +160,3 @@ export default function UsersPage() {
     </div>
   );
 }
-
-    
